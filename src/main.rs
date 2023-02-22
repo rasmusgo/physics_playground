@@ -6,7 +6,7 @@ use rerun::{
     demo_util::lerp,
     external::glam::{self, vec3, Vec3},
     time::{Time, TimeType, Timeline},
-    MsgSender, MsgSenderError, Session,
+    MsgSender, Session,
 };
 
 /// Linearly interpolates from `a` through `b` in `n` steps, returning the intermediate result at
@@ -148,7 +148,10 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
     edges
 }
 
-fn run(mut session: Session) -> Result<(), MsgSenderError> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut session = Session::init("Verlet", true);
+    session.connect(rerun::default_server_addr());
+
     let stable_time = Timeline::new("stable_time", TimeType::Time);
 
     let nx = 10;
@@ -243,13 +246,5 @@ fn run(mut session: Session) -> Result<(), MsgSenderError> {
             .with_splat(radius)?
             .send(&mut session)?;
     }
-    Ok(())
-}
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut session = Session::init("Verlet", true);
-    // session.spawn(run).unwrap();
-    session.connect(rerun::default_server_addr());
-    run(session)?;
     Ok(())
 }
