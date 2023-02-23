@@ -9,6 +9,8 @@ use rerun::{
     MsgSender, Session,
 };
 
+struct DistanceConstraint(usize, usize, f32);
+
 /// Linearly interpolates from `a` through `b` in `n` steps, returning the intermediate result at
 /// each step.
 #[inline]
@@ -41,9 +43,10 @@ fn grid(
     })
 }
 
-fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(usize, usize, f32)> {
-    let mut edges =
-        Vec::with_capacity(nx * ny * (nz - 1) + nx * (ny - 1) * nz + (nx - 1) * ny * nz);
+fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<DistanceConstraint> {
+    let mut edges = Vec::<DistanceConstraint>::with_capacity(
+        nx * ny * (nz - 1) + nx * (ny - 1) * nz + (nx - 1) * ny * nz,
+    );
     // Edges in x direction
     for iz in 0..nz {
         for iy in 0..ny {
@@ -53,7 +56,7 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz * nx * ny + iy * nx + ix2;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -66,7 +69,7 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz * nx * ny + iy2 * nx + ix;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -79,7 +82,7 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz2 * nx * ny + iy * nx + ix;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -94,13 +97,13 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz * nx * ny + iy2 * nx + ix2;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
 
                 let ip1 = iz * nx * ny + iy2 * nx + ix1;
                 let ip2 = iz * nx * ny + iy1 * nx + ix2;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -114,13 +117,13 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz2 * nx * ny + iy2 * nx + ix;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
 
                 let ip1 = iz2 * nx * ny + iy1 * nx + ix;
                 let ip2 = iz1 * nx * ny + iy2 * nx + ix;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -135,13 +138,13 @@ fn create_edges(points_curr: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<(u
                 let ip2 = iz2 * nx * ny + iy * nx + ix2;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
 
                 let ip1 = iz1 * nx * ny + iy * nx + ix2;
                 let ip2 = iz2 * nx * ny + iy * nx + ix1;
                 let p1 = &points_curr[ip1];
                 let p2 = &points_curr[ip2];
-                edges.push((ip1, ip2, p1.distance(*p2)));
+                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
             }
         }
     }
@@ -220,7 +223,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        for &(ip1, ip2, relaxed_length) in &edges {
+        // Resolve distance constraints
+        for &DistanceConstraint(ip1, ip2, relaxed_length) in &edges {
             let p1 = &points_next[ip1];
             let p2 = &points_next[ip2];
             let delta = *p2 - *p1;
