@@ -190,7 +190,7 @@ fn create_shape_constraints(
                     .collect();
                 let a_qq_inv = shape
                     .iter()
-                    .fold(Matrix3::zeros(), |acc, q| q * q.transpose())
+                    .fold(Matrix3::zeros(), |acc, q| acc + q * q.transpose())
                     .try_inverse()
                     .unwrap();
                 constraints.push(ShapeConstraint(ips.to_vec(), shape, a_qq_inv));
@@ -217,7 +217,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         nz,
     )
     .collect::<Vec<_>>();
-    let edges = create_edges(&points_curr, nx, ny, nz);
+    let edges = vec![]; //create_edges(&points_curr, nx, ny, nz);
     let shape_constraints = create_shape_constraints(&points_curr, nx, ny, nz);
 
     let points = points_curr
@@ -288,6 +288,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Resolve shape matching constraints
         for ShapeConstraint(ips, template_shape, a_qq_inv) in &shape_constraints {
+            let a = 0.5;
             let mean: Vector3<f32> = ips
                 .iter()
                 .map(|&ip| Vector3::from(points_next[ip]))
@@ -303,7 +304,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             svd.singular_values[1] = 1.0;
             svd.singular_values[2] =
                 (svd.u.unwrap().determinant() * svd.v_t.unwrap().determinant()).signum();
-            let rot = svd.recompose();
+            let rot = svd.recompose().unwrap();
+            for (i, ip) in ips.iter().enumerate() {
+                points_next[*ip] =
+                    lerp(points_next[*ip], (mean + rot * template_shape[i]).into(), a);
+            }
         }
 
         points_prev = points_curr;
