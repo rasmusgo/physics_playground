@@ -255,6 +255,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dt = 0.01;
     let acc = vec3(0.0, 0.0, -9.82);
     let mut points_prev = points_curr.clone();
+    let mut active_collisions = vec![None; points_curr.len()];
     for i in 0..500 {
         let time = i as f32 * dt;
 
@@ -266,10 +267,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .collect::<Vec<_>>();
 
         // Resolve collisions
-        for p in &mut points_next {
+        for (p, c) in points_next.iter_mut().zip(&mut active_collisions) {
             let d2 = p.length_squared();
             if d2 < r2 {
+                if let Some(prev_collision) = *c {
+                    *p = prev_collision;
+                } else {
                 *p *= r / d2.sqrt();
+                    *c = Some(*p);
+            }
+            } else {
+                *c = None;
             }
         }
 
@@ -316,13 +324,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let points = points_curr
             .iter()
-            .map(|&p| Point3D::from(p))
-            .collect::<Vec<_>>();
+            .map(|&p| p.into())
+            .collect::<Vec<Point3D>>();
+        let collisions = active_collisions
+            .iter()
+            .filter_map(|&op| op)
+            .map(|p| p.into())
+            .collect::<Vec<Point3D>>();
         MsgSender::new("world/points")
             .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
             .with_component(&points)?
             .with_component(&colors)?
             .with_splat(radius)?
+            .send(&mut session)?;
+        MsgSender::new("world/collisions")
+            .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
+            .with_component(&collisions)?
+            .with_splat(ColorRGBA::from_rgb(255, 0, 0))?
+            .with_splat(Radius(0.03))?
             .send(&mut session)?;
     }
     Ok(())
