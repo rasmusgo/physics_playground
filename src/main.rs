@@ -252,11 +252,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_splat(Radius(r))?
         .send(&mut session)?;
 
-    let dt = 0.01;
+    let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
     let mut points_prev = points_curr.clone();
     let mut active_collisions = vec![None; points_curr.len()];
-    for i in 0..500 {
+    for i in 0..1000 {
         let time = i as f32 * dt;
 
         // Predict new positions
@@ -273,12 +273,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if let Some(prev_collision) = *c {
                     *p = prev_collision;
                 } else {
-                *p *= r / d2.sqrt();
+                    *p *= r / d2.sqrt();
                     *c = Some(*p);
-            }
+                }
             } else {
                 *c = None;
             }
+            // if p.z < -r {
+            //     p.z = -r;
+            // }
         }
 
         // Resolve distance constraints
