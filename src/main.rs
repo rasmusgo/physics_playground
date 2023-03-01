@@ -1,6 +1,7 @@
 use std::ops::{Add, Mul};
 
 use nalgebra::{Matrix3, Vector3};
+use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 use rerun::{
     components::{ColorRGBA, Point3D, Radius, ViewCoordinates},
     coordinates::{Handedness, SignedAxis3},
@@ -218,7 +219,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .collect::<Vec<_>>();
     let edges = vec![]; //create_edges(&points_curr, nx, ny, nz);
-    let shape_constraints = create_shape_constraints(&points_curr, nx, ny, nz);
+    let mut shape_constraints = create_shape_constraints(&points_curr, nx, ny, nz);
+    let mut rng = StdRng::seed_from_u64(1188553);
+    shape_constraints.shuffle(&mut rng);
 
     let points = points_curr
         .iter()
@@ -227,7 +230,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let colors = points
         .iter()
-        .map(|_| ColorRGBA::from_rgb(rand::random(), rand::random(), rand::random()))
+        .map(|_| ColorRGBA::from_rgb(rng.gen(), rng.gen(), rng.gen()))
         .collect::<Vec<_>>();
     let radius = Radius(0.025);
     MsgSender::new("world")
