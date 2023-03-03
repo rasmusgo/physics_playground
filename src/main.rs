@@ -250,6 +250,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let inner_r2 = inner_r * inner_r;
     let outer_r = 5.0;
     let outer_r2 = outer_r * outer_r;
+    let stiction_d = 0.02;
+    let stiction_d2 = stiction_d * stiction_d;
     MsgSender::new("world/collider")
         .with_timeless(true)
         .with_component(&[Point3D::ZERO])?
@@ -261,7 +263,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let acc = vec3(0.0, 0.0, -9.82);
     let mut points_prev = points_curr.clone();
     let mut active_collisions = vec![None; points_curr.len()];
-    for i in 0..2000 {
+    for i in 0..3000 {
         let time = i as f32 * dt;
 
         // Predict new positions
@@ -276,14 +278,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let d2 = p.length_squared();
             if d2 < inner_r2 {
                 if let Some(prev_collision) = *c {
-                    *p = prev_collision;
+                    if p.distance_squared(prev_collision) > stiction_d2 {
+                        let delta = *p - prev_collision;
+                        *p -= delta * (stiction_d * delta.length_recip());
+                        *p *= inner_r / p.length();
+                        *c = Some(*p);
+                    } else {
+                        *p = prev_collision;
+                    }
                 } else {
                     *p *= inner_r / d2.sqrt();
                     *c = Some(*p);
                 }
             } else if d2 > outer_r2 {
                 if let Some(prev_collision) = *c {
-                    *p = prev_collision;
+                    if p.distance_squared(prev_collision) > stiction_d2 {
+                        let delta = *p - prev_collision;
+                        *p -= delta * (stiction_d * delta.length_recip());
+                        *p *= outer_r / p.length();
+                        *c = Some(*p);
+                    } else {
+                        *p = prev_collision;
+                    }
                 } else {
                     *p *= outer_r / d2.sqrt();
                     *c = Some(*p);
