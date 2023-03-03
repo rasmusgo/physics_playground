@@ -246,20 +246,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_splat(radius)?
         .send(&mut session)?;
 
-    let r = 1.0;
-    let r2 = r * r;
+    let inner_r = 1.0;
+    let inner_r2 = inner_r * inner_r;
+    let outer_r = 5.0;
+    let outer_r2 = outer_r * outer_r;
     MsgSender::new("world/collider")
         .with_timeless(true)
         .with_component(&[Point3D::ZERO])?
         .with_splat(ColorRGBA::from_rgb(100, 100, 100))?
-        .with_splat(Radius(r))?
+        .with_splat(Radius(inner_r))?
         .send(&mut session)?;
 
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
     let mut points_prev = points_curr.clone();
     let mut active_collisions = vec![None; points_curr.len()];
-    for i in 0..1000 {
+    for i in 0..2000 {
         let time = i as f32 * dt;
 
         // Predict new positions
@@ -272,11 +274,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Resolve collisions
         for (p, c) in points_next.iter_mut().zip(&mut active_collisions) {
             let d2 = p.length_squared();
-            if d2 < r2 {
+            if d2 < inner_r2 {
                 if let Some(prev_collision) = *c {
                     *p = prev_collision;
                 } else {
-                    *p *= r / d2.sqrt();
+                    *p *= inner_r / d2.sqrt();
+                    *c = Some(*p);
+                }
+            } else if d2 > outer_r2 {
+                if let Some(prev_collision) = *c {
+                    *p = prev_collision;
+                } else {
+                    *p *= outer_r / d2.sqrt();
                     *c = Some(*p);
                 }
             } else {
