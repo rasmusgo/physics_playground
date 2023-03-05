@@ -14,6 +14,17 @@ struct DistanceConstraint(usize, usize, f32);
 
 struct ShapeConstraint(Vec<usize>, Vec<Vector3<f32>>, Matrix3<f32>);
 
+enum ContactState {
+    New,
+    Sticking,
+    Sliding,
+}
+
+struct Contact {
+    point: Vec3,
+    state: ContactState,
+}
+
 /// Linearly interpolates from `a` through `b` in `n` steps, returning the intermediate result at
 /// each step.
 #[inline]
@@ -262,7 +273,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
     let mut points_prev = points_curr.clone();
-    let mut active_collisions = vec![None; points_curr.len()];
+    let mut active_collisions = Vec::<Option<Contact>>::new();
+    active_collisions.resize_with(points_curr.len(), Default::default);
     for i in 0..3000 {
         let time = i as f32 * dt;
 
@@ -281,34 +293,52 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 *p *= inner_r / length;
                 let stiction_d = (inner_r - length) * stiction_factor;
                 let stiction_d2 = stiction_d * stiction_d;
-                if let Some(prev_collision) = *c {
-                    if p.distance_squared(prev_collision) > stiction_d2 {
-                        let delta = *p - prev_collision;
+                if let Some(Contact {
+                    point: contact_point,
+                    state: contact_state,
+                }) = c
+                {
+                    if p.distance_squared(*contact_point) > stiction_d2 {
+                        let delta = *p - *contact_point;
                         *p -= delta * (stiction_d * delta.length_recip());
                         *p *= inner_r / p.length();
-                        *c = Some(*p);
+                        *contact_point = *p;
+                        *contact_state = ContactState::Sliding;
                     } else {
-                        *p = prev_collision;
+                        *p = *contact_point;
+                        *contact_state = ContactState::Sticking;
                     }
                 } else {
-                    *c = Some(*p);
+                    *c = Some(Contact {
+                        point: *p,
+                        state: ContactState::New,
+                    });
                 }
             } else if d2 > outer_r2 {
                 let length = p.length();
                 *p *= outer_r / length;
                 let stiction_d = (length - outer_r) * stiction_factor;
                 let stiction_d2 = stiction_d * stiction_d;
-                if let Some(prev_collision) = *c {
-                    if p.distance_squared(prev_collision) > stiction_d2 {
-                        let delta = *p - prev_collision;
+                if let Some(Contact {
+                    point: contact_point,
+                    state: contact_state,
+                }) = c
+                {
+                    if p.distance_squared(*contact_point) > stiction_d2 {
+                        let delta = *p - *contact_point;
                         *p -= delta * (stiction_d * delta.length_recip());
                         *p *= outer_r / p.length();
-                        *c = Some(*p);
+                        *contact_point = *p;
+                        *contact_state = ContactState::Sliding;
                     } else {
-                        *p = prev_collision;
+                        *p = *contact_point;
+                        *contact_state = ContactState::Sticking;
                     }
                 } else {
-                    *c = Some(*p);
+                    *c = Some(Contact {
+                        point: *p,
+                        state: ContactState::New,
+                    });
                 }
             } else {
                 *c = None;
@@ -367,9 +397,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .collect::<Vec<Point3D>>();
         let collisions = active_collisions
             .iter()
-            .filter_map(|&op| op)
-            .map(|p| p.into())
+            .filter_map(|op| op.as_ref())
+            .map(|p| p.point.into())
             .collect::<Vec<Point3D>>();
+        let collision_colors = active_collisions
+            .iter()
+            .filter_map(|op| op.as_ref())
+            .map(|p| match p.state {
+                ContactState::New => ColorRGBA::from_rgb(255, 0, 255),
+                ContactState::Sticking => ColorRGBA::from_rgb(255, 0, 0),
+                ContactState::Sliding => ColorRGBA::from_rgb(255, 255, 0),
+            })
+            .collect::<Vec<ColorRGBA>>();
         MsgSender::new("world/points")
             .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
             .with_component(&points)?
@@ -379,7 +418,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         MsgSender::new("world/collisions")
             .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
             .with_component(&collisions)?
-            .with_splat(ColorRGBA::from_rgb(255, 0, 0))?
+            .with_component(&collision_colors)?
             .with_splat(Radius(0.03))?
             .send(&mut session)?;
     }
