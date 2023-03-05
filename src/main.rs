@@ -250,8 +250,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let inner_r2 = inner_r * inner_r;
     let outer_r = 5.0;
     let outer_r2 = outer_r * outer_r;
-    let stiction_d = 0.02;
-    let stiction_d2 = stiction_d * stiction_d;
+    let stiction_factor = 0.25; // Maximum tangential correction per correction along normal.
     let shape_stiffness = 0.25;
     MsgSender::new("world/collider")
         .with_timeless(true)
@@ -278,6 +277,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         for (p, c) in points_next.iter_mut().zip(&mut active_collisions) {
             let d2 = p.length_squared();
             if d2 < inner_r2 {
+                let length = p.length();
+                *p *= inner_r / length;
+                let stiction_d = (inner_r - length) * stiction_factor;
+                let stiction_d2 = stiction_d * stiction_d;
                 if let Some(prev_collision) = *c {
                     if p.distance_squared(prev_collision) > stiction_d2 {
                         let delta = *p - prev_collision;
@@ -288,10 +291,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         *p = prev_collision;
                     }
                 } else {
-                    *p *= inner_r / d2.sqrt();
                     *c = Some(*p);
                 }
             } else if d2 > outer_r2 {
+                let length = p.length();
+                *p *= outer_r / length;
+                let stiction_d = (length - outer_r) * stiction_factor;
+                let stiction_d2 = stiction_d * stiction_d;
                 if let Some(prev_collision) = *c {
                     if p.distance_squared(prev_collision) > stiction_d2 {
                         let delta = *p - prev_collision;
@@ -302,7 +308,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         *p = prev_collision;
                     }
                 } else {
-                    *p *= outer_r / d2.sqrt();
                     *c = Some(*p);
                 }
             } else {
