@@ -278,17 +278,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
-    let mut points_prev = points_curr.clone();
+    let mut velocities = vec![vec3(0.0, 0.0, 0.0); points_curr.len()];
     let mut active_collisions = Vec::<Option<Contact>>::new();
     active_collisions.resize_with(points_curr.len(), Default::default);
     for i in 0..3000 {
         let time = i as f32 * dt;
 
+        // Update velocities
+        for vel in &mut velocities {
+            *vel += acc * dt;
+        }
+
         // Predict new positions
         let mut points_next = points_curr
             .iter()
-            .zip(points_prev)
-            .map(|(&curr, prev)| curr + (curr - prev) + acc * dt * dt)
+            .zip(velocities)
+            .map(|(&curr, vel)| curr + vel * dt)
             .collect::<Vec<_>>();
 
         // Resolve collisions
@@ -394,7 +399,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        points_prev = points_curr;
+        // Update velocities
+        velocities = points_next
+            .iter()
+            .zip(points_curr)
+            .map(|(&next, curr)| (next - curr) / dt)
+            .collect::<Vec<_>>();
+
         points_curr = points_next;
 
         let points = points_curr
