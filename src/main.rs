@@ -241,7 +241,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let colors = points
         .iter()
-        .map(|_| ColorRGBA::from_rgb(rng.gen(), rng.gen(), rng.gen()))
+        .map(|_| {
+            ColorRGBA::from_rgb(
+                rng.gen::<u8>() / 2 + 64,
+                rng.gen::<u8>() / 2 + 64,
+                rng.gen::<u8>() / 2 + 64,
+            )
+        })
         .collect::<Vec<_>>();
     let radius = Radius(0.025);
     MsgSender::new("world")
