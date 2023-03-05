@@ -252,6 +252,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let outer_r2 = outer_r * outer_r;
     let stiction_d = 0.02;
     let stiction_d2 = stiction_d * stiction_d;
+    let shape_stiffness = 0.25;
     MsgSender::new("world/collider")
         .with_timeless(true)
         .with_component(&[Point3D::ZERO])?
@@ -327,7 +328,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Resolve shape matching constraints
         for ShapeConstraint(ips, template_shape, a_qq_inv) in &shape_constraints {
-            let a = 0.5;
             let mean: Vector3<f32> = ips
                 .iter()
                 .map(|&ip| Vector3::from(points_next[ip]))
@@ -345,8 +345,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 (svd.u.unwrap().determinant() * svd.v_t.unwrap().determinant()).signum();
             let rot = svd.recompose().unwrap();
             for (i, ip) in ips.iter().enumerate() {
-                points_next[*ip] =
-                    lerp(points_next[*ip], (mean + rot * template_shape[i]).into(), a);
+                points_next[*ip] = lerp(
+                    points_next[*ip],
+                    (mean + rot * template_shape[i]).into(),
+                    shape_stiffness,
+                );
             }
         }
 
