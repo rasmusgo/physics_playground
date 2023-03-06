@@ -394,12 +394,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (i, ip) in ips.iter().enumerate() {
                 let goal = Vec3::from(mean + rot * template_shape[i]);
                 let delta = points_next[*ip] - goal;
-                let c = delta.length();
-                if c != 0.0 {
-                    let lambda = -c / (1.0 + shape_compliance_per_dt2);
-                    let correction = delta * (lambda / c);
-                    points_next[*ip] += correction;
-                }
+                let correction = delta * (-1.0 / (1.0 + shape_compliance_per_dt2));
+                points_next[*ip] += correction;
             }
         }
 
