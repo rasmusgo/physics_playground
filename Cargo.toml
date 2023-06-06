@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
 rand = "0.8.5"
-rerun = "0.2.0"
+rerun = "0.6.0"
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]

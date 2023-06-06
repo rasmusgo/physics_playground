@@ -3,7 +3,7 @@
 1. Install rerun and cargo watch
 
     cargo install cargo-watch
-    cargo install -f rerun
+    cargo install -f rerun-cli
 
 2. Start viewer in one terminal:
 

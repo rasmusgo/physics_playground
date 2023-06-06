@@ -8,7 +8,7 @@ use rerun::{
     demo_util::lerp,
     external::glam::{self, vec3, Vec3},
     time::{Time, TimeType, Timeline},
-    MsgSender, Session,
+    MsgSender, RecordingStreamBuilder,
 };
 struct DistanceConstraint(usize, usize, f32);
 
@@ -213,8 +213,7 @@ fn create_shape_constraints(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut session = Session::init("Verlet", true);
-    session.connect(rerun::default_server_addr());
+    let recording = RecordingStreamBuilder::new("Verlet").connect(rerun::default_server_addr())?;
 
     let stable_time = Timeline::new("stable_time", TimeType::Time);
 
@@ -256,12 +255,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             SignedAxis3::POSITIVE_Z,
             Handedness::Right,
         ))?
-        .send(&mut session)?;
+        .send(&recording)?;
     MsgSender::new("world/points")
         .with_component(&points)?
         .with_component(&colors)?
         .with_splat(radius)?
-        .send(&mut session)?;
+        .send(&recording)?;
 
     let inner_r = 1.0;
     let inner_r2 = inner_r * inner_r;
@@ -274,7 +273,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_component(&[Point3D::ZERO])?
         .with_splat(ColorRGBA::from_rgb(100, 100, 100))?
         .with_splat(Radius(inner_r))?
-        .send(&mut session)?;
+        .send(&recording)?;
 
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
@@ -431,13 +430,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .with_component(&points)?
             .with_component(&colors)?
             .with_splat(radius)?
-            .send(&mut session)?;
+            .send(&recording)?;
         MsgSender::new("world/collisions")
             .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
             .with_component(&collisions)?
             .with_component(&collision_colors)?
             .with_splat(Radius(0.03))?
-            .send(&mut session)?;
+            .send(&recording)?;
     }
     Ok(())
 }
