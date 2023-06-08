@@ -1669,6 +1669,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "g3"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3132ff992f220f36cab324c5c8a3363de7b5ed5a32b5d66c12956fc517eefed8"
+
+[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1677,6 +1683,12 @@ dependencies = [
  "typenum",
  "version_check",
 ]
+
+[[package]]
+name = "geometric_algebra"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7101f1a0f8ecb66eaf1c2569e863e9e991bd18bebf404697cf11a547247306a"
 
 [[package]]
 name = "gethostname"
@@ -2867,6 +2879,9 @@ checksum = "9b2a4787296e9989611394c33f193f676704af1686e70b8f8033ab5ba9a35a94"
 name = "physics_playground"
 version = "0.1.0"
 dependencies = [
+ "g3",
+ "geometric_algebra",
+ "itertools",
  "nalgebra",
  "rand",
  "rerun",
