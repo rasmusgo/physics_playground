@@ -25,9 +25,9 @@ impl IntoRerun<ppga3d::Point> for ppga3d::Point {
     fn into_rerun(self) -> Self::Output {
         unsafe {
             rr::Point3D::new(
-                self.group0().f32x4[0],
                 self.group0().f32x4[1],
                 self.group0().f32x4[2],
+                self.group0().f32x4[3],
             )
         }
     }
@@ -83,14 +83,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let radius = rr::Radius(0.025);
 
     let point_in_local = [
-        ppga3d::Point::new(-0.5, -0.5, -0.5, 1.0),
-        ppga3d::Point::new(-0.5, -0.5, 0.5, 1.0),
-        ppga3d::Point::new(-0.5, 0.5, -0.5, 1.0),
-        ppga3d::Point::new(-0.5, 0.5, 0.5, 1.0),
-        ppga3d::Point::new(0.5, -0.5, -0.5, 1.0),
-        ppga3d::Point::new(0.5, -0.5, 0.5, 1.0),
-        ppga3d::Point::new(0.5, 0.5, -0.5, 1.0),
-        ppga3d::Point::new(0.5, 0.5, 0.5, 1.0),
+        ppga3d::Point::new(1.0, -0.5, -0.5, -0.5),
+        ppga3d::Point::new(1.0, -0.5, -0.5, 0.5),
+        ppga3d::Point::new(1.0, -0.5, 0.5, -0.5),
+        ppga3d::Point::new(1.0, -0.5, 0.5, 0.5),
+        ppga3d::Point::new(1.0, 0.5, -0.5, -0.5),
+        ppga3d::Point::new(1.0, 0.5, -0.5, 0.5),
+        ppga3d::Point::new(1.0, 0.5, 0.5, -0.5),
+        ppga3d::Point::new(1.0, 0.5, 0.5, 0.5),
     ];
 
     let edges: Vec<Edge> = (0..point_in_local.len())
@@ -106,7 +106,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut state = State {
         m: ppga3d::Motor::one(),
-        b: ppga3d::Line::zero(),
+        b: ppga3d::Line::new(
+            0.0, // e01
+            0.0, // e02
+            0.0, // e03
+            1.0, // e23
+            1.3, // -e13
+            0.5, // e12
+        ),
     };
     let dt = 0.001;
     for i in 0..3000 {
