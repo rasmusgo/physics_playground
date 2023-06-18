@@ -213,7 +213,8 @@ fn create_shape_constraints(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let recording = RecordingStreamBuilder::new("Verlet").connect(rerun::default_server_addr())?;
+    let recording =
+        RecordingStreamBuilder::new("XPBD particles").connect(rerun::default_server_addr())?;
 
     let stable_time = Timeline::new("stable_time", TimeType::Time);
 
