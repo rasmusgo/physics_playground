@@ -1,14 +1,18 @@
 [package]
-name = "verlet"
+name = "physics_playground"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "xpbd_particles"
+path = "src/xpbd_particles.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
 rand = "0.8.5"
-rerun = "0.2.0"
+rerun = "0.6.0"
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]

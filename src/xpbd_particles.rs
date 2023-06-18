@@ -8,9 +8,8 @@ use rerun::{
     demo_util::lerp,
     external::glam::{self, vec3, Vec3},
     time::{Time, TimeType, Timeline},
-    MsgSender, Session,
+    MsgSender, RecordingStreamBuilder,
 };
-struct DistanceConstraint(usize, usize, f32);
 
 struct ShapeConstraint(Vec<usize>, Vec<Vector3<f32>>, Matrix3<f32>);
 
@@ -55,114 +54,6 @@ fn grid(
         linspace(from.y, to.y, ny)
             .flat_map(move |y| linspace(from.x, to.x, nx).map(move |x| (x, y, z).into()))
     })
-}
-
-fn create_edges(points: &[Vec3], nx: usize, ny: usize, nz: usize) -> Vec<DistanceConstraint> {
-    let mut edges = Vec::<DistanceConstraint>::with_capacity(
-        nx * ny * (nz - 1) + nx * (ny - 1) * nz + (nx - 1) * ny * nz,
-    );
-    // Edges in x direction
-    for iz in 0..nz {
-        for iy in 0..ny {
-            for ix2 in 1..nx {
-                let ix1 = ix2 - 1;
-                let ip1 = iz * nx * ny + iy * nx + ix1;
-                let ip2 = iz * nx * ny + iy * nx + ix2;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    // Edges in y direction
-    for iz in 0..nz {
-        for iy2 in 1..ny {
-            let iy1 = iy2 - 1;
-            for ix in 0..nx {
-                let ip1 = iz * nx * ny + iy1 * nx + ix;
-                let ip2 = iz * nx * ny + iy2 * nx + ix;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    // Edges in z direction
-    for iz2 in 1..nz {
-        let iz1 = iz2 - 1;
-        for iy in 0..ny {
-            for ix in 0..nx {
-                let ip1 = iz1 * nx * ny + iy * nx + ix;
-                let ip2 = iz2 * nx * ny + iy * nx + ix;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    // Edges in xy direction
-    for iz in 0..nz {
-        for iy2 in 1..ny {
-            let iy1 = iy2 - 1;
-            for ix2 in 1..nx {
-                let ix1 = ix2 - 1;
-
-                let ip1 = iz * nx * ny + iy1 * nx + ix1;
-                let ip2 = iz * nx * ny + iy2 * nx + ix2;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-
-                let ip1 = iz * nx * ny + iy2 * nx + ix1;
-                let ip2 = iz * nx * ny + iy1 * nx + ix2;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    // Edges in yz direction
-    for iz2 in 1..nz {
-        let iz1 = iz2 - 1;
-        for iy2 in 1..ny {
-            let iy1 = iy2 - 1;
-            for ix in 0..nx {
-                let ip1 = iz1 * nx * ny + iy1 * nx + ix;
-                let ip2 = iz2 * nx * ny + iy2 * nx + ix;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-
-                let ip1 = iz2 * nx * ny + iy1 * nx + ix;
-                let ip2 = iz1 * nx * ny + iy2 * nx + ix;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    // Edges in zx direction
-    for iz2 in 1..nz {
-        let iz1 = iz2 - 1;
-        for iy in 0..ny {
-            for ix2 in 1..nx {
-                let ix1 = ix2 - 1;
-
-                let ip1 = iz1 * nx * ny + iy * nx + ix1;
-                let ip2 = iz2 * nx * ny + iy * nx + ix2;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-
-                let ip1 = iz1 * nx * ny + iy * nx + ix2;
-                let ip2 = iz2 * nx * ny + iy * nx + ix1;
-                let p1 = &points[ip1];
-                let p2 = &points[ip2];
-                edges.push(DistanceConstraint(ip1, ip2, p1.distance(*p2)));
-            }
-        }
-    }
-    edges
 }
 
 fn create_shape_constraints(
@@ -213,8 +104,8 @@ fn create_shape_constraints(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut session = Session::init("Verlet", true);
-    session.connect(rerun::default_server_addr());
+    let recording =
+        RecordingStreamBuilder::new("XPBD particles").connect(rerun::default_server_addr())?;
 
     let stable_time = Timeline::new("stable_time", TimeType::Time);
 
@@ -229,7 +120,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         nz,
     )
     .collect::<Vec<_>>();
-    let edges = vec![]; //create_edges(&points_curr, nx, ny, nz);
     let mut shape_constraints = create_shape_constraints(&points_curr, nx, ny, nz);
     let mut rng = StdRng::seed_from_u64(1188553);
     shape_constraints.shuffle(&mut rng);
@@ -256,12 +146,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             SignedAxis3::POSITIVE_Z,
             Handedness::Right,
         ))?
-        .send(&mut session)?;
+        .send(&recording)?;
     MsgSender::new("world/points")
         .with_component(&points)?
         .with_component(&colors)?
         .with_splat(radius)?
-        .send(&mut session)?;
+        .send(&recording)?;
 
     let inner_r = 1.0;
     let inner_r2 = inner_r * inner_r;
@@ -274,7 +164,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_component(&[Point3D::ZERO])?
         .with_splat(ColorRGBA::from_rgb(100, 100, 100))?
         .with_splat(Radius(inner_r))?
-        .send(&mut session)?;
+        .send(&recording)?;
 
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
@@ -359,19 +249,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // }
         }
 
-        // Resolve distance constraints
-        for &DistanceConstraint(ip1, ip2, relaxed_length) in &edges {
-            let p1 = &points_next[ip1];
-            let p2 = &points_next[ip2];
-            let delta = *p2 - *p1;
-            let actual_length = delta.length();
-            let displacement = actual_length - relaxed_length;
-            let a = 1.0;
-            let adjustment = delta * (displacement / actual_length * 0.5 * a);
-            points_next[ip1] += adjustment;
-            points_next[ip2] -= adjustment;
-        }
-
         // Resolve shape matching constraints
         let shape_compliance_per_dt2 = shape_compliance / (dt * dt);
         for ShapeConstraint(ips, template_shape, a_qq_inv) in &shape_constraints {
@@ -431,13 +308,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .with_component(&points)?
             .with_component(&colors)?
             .with_splat(radius)?
-            .send(&mut session)?;
+            .send(&recording)?;
         MsgSender::new("world/collisions")
             .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
             .with_component(&collisions)?
             .with_component(&collision_colors)?
             .with_splat(Radius(0.03))?
-            .send(&mut session)?;
+            .send(&recording)?;
     }
     Ok(())
 }
