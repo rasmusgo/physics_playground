@@ -16,15 +16,24 @@ mod rr {
 }
 
 trait IntoRerun<T> {
-    type Output;
-    fn into_rerun(self) -> Self::Output;
+    fn into_rerun(self) -> rr::Point3D;
+    fn into_rerun_vec(self) -> rr::Vec3D;
 }
 
 impl IntoRerun<ppga3d::Point> for ppga3d::Point {
-    type Output = rr::Point3D;
-    fn into_rerun(self) -> Self::Output {
+    fn into_rerun(self) -> rr::Point3D {
         unsafe {
             rr::Point3D::new(
+                self.group0().f32x4[1],
+                self.group0().f32x4[2],
+                self.group0().f32x4[3],
+            )
+        }
+    }
+
+    fn into_rerun_vec(self) -> rr::Vec3D {
+        unsafe {
+            rr::Vec3D::new(
                 self.group0().f32x4[1],
                 self.group0().f32x4[2],
                 self.group0().f32x4[3],
@@ -50,12 +59,12 @@ const ATTACH_IN_BODY: ppga3d::Point = ppga3d::Point::new(1.0, 0.5, 0.5, 0.5);
 
 struct State {
     pub world_from_local: ppga3d::Motor,
-    pub velocity_in_local: ppga3d::Line,
+    pub velocity_in_local: ppga3d::Motor,
 }
 
 struct DState {
     pub d_world_from_local: ppga3d::Motor,
-    pub d_velocity_in_local: ppga3d::Line,
+    pub d_velocity_in_local: ppga3d::Motor,
 }
 
 struct Edge {
@@ -69,33 +78,40 @@ fn dState(state: &State) -> DState {
             .world_from_local
             .geometric_product(state.velocity_in_local)
             .scale(-0.5),
-        d_velocity_in_local: forques(state)
-            + ppga3d::Scalar::new(-0.5).geometric_product(
-                (state.velocity_in_local.dual() * state.velocity_in_local
-                    - state.velocity_in_local * state.velocity_in_local.dual())
-                .reversal()
-                .dual(),
-            ),
+        d_velocity_in_local: (forques(state)
+            - (state
+                .velocity_in_local
+                .dual()
+                .geometric_product(state.velocity_in_local)
+                - state
+                    .velocity_in_local
+                    .geometric_product(state.velocity_in_local.dual()))
+            .scale(0.5))
+        .dual(),
     }
 }
 
-fn forques(state: &State) -> ppga3d::Line {
+fn forques(state: &State) -> ppga3d::Motor {
     let gravity_vector = ppga3d::Line::new(0.0, 0.0, -9.81, 0.0, 0.0, 0.0);
     let gravity = state
         .world_from_local
         .reversal()
         .transformation(gravity_vector)
         .dual();
-    let k = -12.0;
+    let k = -10.0;
     let hooke = state
         .world_from_local
         .reversal()
         .transformation(ATTACH_ANCHOR)
         .regressive_product(ATTACH_IN_BODY)
         .scale(k);
-    let damping = state.velocity_in_local.scale(-0.5);
-    gravity // + damping
-            // gravity + hooke + damping
+    let damping = state.velocity_in_local.scale(-0.25).dual();
+    // gravity
+    // gravity + damping
+    // damping
+    gravity + hooke + damping
+    // hooke + damping
+    // ppga3d::Line::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -136,14 +152,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut state = State {
         world_from_local: ppga3d::Motor::one(),
-        velocity_in_local: ppga3d::Line::new(
-            0.0, // e01
-            0.0, // e02
-            0.0, // e03
-            1.0, // e23
-            1.3, // -e13
-            0.5, // e12
+        velocity_in_local: ppga3d::Motor::new(
+            0.0, //
+            0.0, // rx
+            0.0, // ry
+            0.0, // rz
+            0.0, //
+            0.0, // tx
+            0.0, // ty
+            0.0, // tz
         ),
+        // velocity_in_local: ppga3d::Motor::new(
+        //     0.0,  //
+        //     1.0,  // rx
+        //     0.0,  // ry
+        //     0.0,  // rz
+        //     0.0,  //
+        //     0.0,  // tx
+        //     0.0,  // ty
+        //     10.0, // tz
+        // ),
     };
 
     let dt = 0.001;
@@ -173,7 +201,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .into(),
             })
             .collect::<Vec<rr::Arrow3D>>();
-        let anchor = ATTACH_IN_BODY.into_rerun();
+        let anchor = ATTACH_ANCHOR.into_rerun();
         let point = state
             .world_from_local
             .transformation(ATTACH_IN_BODY)
@@ -204,6 +232,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
             )
             .with_component(&springs)?
+            .send(&recording)?;
+
+        let lines_in_local = edges
+            .iter()
+            .map(|e| rr::Arrow3D {
+                origin: points_in_local[e.i].into_rerun_vec(),
+                vector: (points_in_local[e.j] - points_in_local[e.i]).into_rerun_vec(),
+            })
+            .collect::<Vec<rr::Arrow3D>>();
+        let anchor_in_local = state
+            .world_from_local
+            .reversal()
+            .transformation(ATTACH_ANCHOR);
+        let springs_in_local = vec![rr::Arrow3D {
+            origin: anchor_in_local.into_rerun_vec(),
+            vector: (ATTACH_IN_BODY - anchor_in_local).into_rerun_vec(),
+        }];
+        rr::MsgSender::new("local/points")
+            .with_time(
+                stable_time,
+                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+            )
+            .with_component(&[anchor_in_local.into_rerun()])?
+            .with_splat(radius)?
+            .send(&recording)?;
+        rr::MsgSender::new("local/lines")
+            .with_time(
+                stable_time,
+                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+            )
+            .with_component(&lines_in_local)?
+            .send(&recording)?;
+        rr::MsgSender::new("local/springs")
+            .with_time(
+                stable_time,
+                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+            )
+            .with_component(&springs_in_local)?
             .send(&recording)?;
     }
 
