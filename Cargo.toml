@@ -27,7 +27,7 @@ geometric_algebra = "0.2.1"
 itertools = "0.10.5"
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
 rand = "0.8.5"
-rerun = "0.6.0"
+rerun = "0.7"
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]
