@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
+name = "xpbd_rigid_bodies"
+path = "src/xpbd_rigid_bodies.rs"
+
+[[bin]]
 name = "xpbd_particles"
 path = "src/xpbd_particles.rs"
 
