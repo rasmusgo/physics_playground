@@ -17,14 +17,16 @@ mod rr {
 }
 
 trait IntoRerun<T> {
-    type Output;
-    fn into_rerun(self) -> Self::Output;
+    fn into_rerun(self) -> rr::Point3D;
+    fn into_rerun_vec(self) -> rr::Vec3D;
 }
 
 impl IntoRerun<PGA3D> for PGA3D {
-    type Output = rr::Point3D;
-    fn into_rerun(self) -> Self::Output {
+    fn into_rerun(self) -> rr::Point3D {
         rr::Point3D::new(self[11] as _, self[12] as _, self[13] as _)
+    }
+    fn into_rerun_vec(self) -> rr::Vec3D {
+        rr::Vec3D::new(self[11] as _, self[12] as _, self[13] as _)
     }
 }
 
@@ -59,44 +61,26 @@ struct Edge {
 fn dState(state: &State) -> DState {
     let world_from_local = &state.world_from_local;
     let velocity_in_local = &state.velocity_in_local;
-    let d_velocity_in_local = PGA3D::from_elements(
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        velocity_in_local[Basis::e02 as _] * velocity_in_local[Basis::e12 as _]
-            - velocity_in_local[Basis::e03 as _] * velocity_in_local[Basis::e31 as _],
-        velocity_in_local[Basis::e03 as _] * velocity_in_local[Basis::e23 as _]
-            - velocity_in_local[Basis::e01 as _] * velocity_in_local[Basis::e12 as _],
-        velocity_in_local[Basis::e01 as _] * velocity_in_local[Basis::e31 as _]
-            - velocity_in_local[Basis::e02 as _] * velocity_in_local[Basis::e23 as _],
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-    );
     DState {
         d_world_from_local: -0.5 * world_from_local * velocity_in_local,
-        d_velocity_in_local: d_velocity_in_local,
+        d_velocity_in_local: (forques(state)
+            - 0.5
+                * (velocity_in_local.Dual() * velocity_in_local
+                    - velocity_in_local * velocity_in_local.Dual()))
+        .Dual(),
     }
 }
 
 fn forques(state: &State) -> PGA3D {
     let world_from_local = &state.world_from_local;
     let velocity_in_local = &state.velocity_in_local;
-    let gravity_vector = PGA3D::e02() * -9.81;
-    let gravity = ((world_from_local.Reverse()) * gravity_vector.Dual() * world_from_local).Dual();
+    let gravity_vector = PGA3D::e01() * -9.81;
+    let local_from_world = &world_from_local.Reverse();
+    let gravity = (local_from_world * gravity_vector * world_from_local).Dual();
     let k = 12.0;
-    let hooke =
-        k * (((world_from_local.Reverse()) * ATTACH_ANCHOR * world_from_local) & ATTACH_IN_BODY);
-    let damping = -0.25 * velocity_in_local;
-    gravity // + damping
-            // gravity + hooke + damping
+    let hooke = k * ((local_from_world * ATTACH_ANCHOR * world_from_local) & ATTACH_IN_BODY);
+    let damping = -0.25 * !velocity_in_local;
+    gravity + hooke + damping
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -166,7 +150,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .into(),
             })
             .collect::<Vec<rr::Arrow3D>>();
-        let anchor = ATTACH_IN_BODY.into_rerun();
+        let anchor = ATTACH_ANCHOR.into_rerun();
         let point = (&state.world_from_local * ATTACH_IN_BODY * state.world_from_local.Reverse())
             .into_rerun();
         let springs = vec![rr::Arrow3D {
