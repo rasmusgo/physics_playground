@@ -59,12 +59,12 @@ const ATTACH_IN_BODY: ppga3d::Point = ppga3d::Point::new(1.0, 0.5, 0.5, 0.5);
 
 struct State {
     pub world_from_local: ppga3d::Motor,
-    pub velocity_in_local: ppga3d::Motor,
+    pub velocity_in_local: ppga3d::Line,
 }
 
 struct DState {
     pub d_world_from_local: ppga3d::Motor,
-    pub d_velocity_in_local: ppga3d::Motor,
+    pub d_velocity_in_local: ppga3d::Line,
 }
 
 struct Edge {
@@ -79,19 +79,21 @@ fn dState(state: &State) -> DState {
             .geometric_product(state.velocity_in_local)
             .scale(-0.5),
         d_velocity_in_local: (forques(state)
-            - (state
-                .velocity_in_local
-                .dual()
-                .geometric_product(state.velocity_in_local)
-                - state
+            - Into::<ppga3d::Line>::into(
+                state
                     .velocity_in_local
-                    .geometric_product(state.velocity_in_local.dual()))
+                    .dual()
+                    .geometric_product(state.velocity_in_local)
+                    - state
+                        .velocity_in_local
+                        .geometric_product(state.velocity_in_local.dual()),
+            )
             .scale(0.5))
         .dual(),
     }
 }
 
-fn forques(state: &State) -> ppga3d::Motor {
+fn forques(state: &State) -> ppga3d::Line {
     let gravity_vector = ppga3d::Line::new(0.0, 0.0, -9.81, 0.0, 0.0, 0.0);
     let gravity = state
         .world_from_local
@@ -152,12 +154,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut state = State {
         world_from_local: ppga3d::Motor::one(),
-        velocity_in_local: ppga3d::Motor::new(
-            0.0, //
+        velocity_in_local: ppga3d::Line::new(
             0.0, // rx
             0.0, // ry
             0.0, // rz
-            0.0, //
             0.0, // tx
             0.0, // ty
             0.0, // tz
