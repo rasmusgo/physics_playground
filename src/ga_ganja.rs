@@ -1,10 +1,6 @@
-use std::ops::{Add, Mul};
-
 use itertools::Itertools;
-use nalgebra::{Matrix3, Vector3};
-use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 mod pga3d;
-use pga3d::{Basis, PGA3D};
+use pga3d::PGA3D;
 mod rr {
     pub use rerun::{
         components::{Arrow3D, ColorRGBA, Point3D, Radius, Vec3D, ViewCoordinates},
@@ -30,11 +26,6 @@ impl IntoRerun<PGA3D> for PGA3D {
     }
 }
 
-fn is_colliding(plane: &PGA3D, points: &[PGA3D]) -> bool {
-    // TODO: Should this really test only the scalar part?
-    points.iter().any(|p| (p & plane)[0] < 0.0)
-}
-
 fn is_edge(i: usize, j: usize) -> bool {
     let x = i ^ j; // xor both together, all differing bits will be '1'
     (x & (x - 1)) == 0 // only if x has one bit, this returns true.
@@ -58,7 +49,7 @@ struct Edge {
     pub j: usize,
 }
 
-fn dState(state: &State) -> DState {
+fn d_state(state: &State) -> DState {
     let world_from_local = &state.world_from_local;
     let velocity_in_local = &state.velocity_in_local;
     DState {
@@ -126,7 +117,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let dt = 0.001;
     for i in 0..3000 {
-        let d_state = dState(&state);
+        let d_state = d_state(&state);
         state.world_from_local = &state.world_from_local + &d_state.d_world_from_local * dt;
         state.velocity_in_local = &state.velocity_in_local + &d_state.d_velocity_in_local * dt;
         // state.world_from_local.normalize_motor_in_place();
@@ -161,7 +152,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         rr::MsgSender::new("world/points")
             .with_time(
                 stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+                rr::Time::from_seconds_since_epoch(i as f64 * dt),
             )
             .with_component(&points)?
             .with_splat(radius)?
@@ -169,14 +160,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         rr::MsgSender::new("world/lines")
             .with_time(
                 stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+                rr::Time::from_seconds_since_epoch(i as f64 * dt),
             )
             .with_component(&lines)?
             .send(&recording)?;
         rr::MsgSender::new("world/springs")
             .with_time(
                 stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt as f64),
+                rr::Time::from_seconds_since_epoch(i as f64 * dt),
             )
             .with_component(&springs)?
             .send(&recording)?;
