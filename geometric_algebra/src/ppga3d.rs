@@ -61,6 +61,18 @@ impl std::convert::From<[f32; 1]> for Scalar {
     }
 }
 
+impl std::convert::From<Scalar> for f32 {
+    fn from(vector: Scalar) -> Self {
+        unsafe { vector.elements[0] }
+    }
+}
+
+impl std::convert::From<f32> for Scalar {
+    fn from(value: f32) -> Self {
+        Self { elements: [value] }
+    }
+}
+
 impl std::fmt::Debug for Scalar {
     fn fmt(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         formatter
