@@ -1697,8 +1697,6 @@ dependencies = [
 [[package]]
 name = "geometric_algebra"
 version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7101f1a0f8ecb66eaf1c2569e863e9e991bd18bebf404697cf11a547247306a"
 
 [[package]]
 name = "gethostname"

@@ -27,7 +27,7 @@ path = "src/ga_ganja.rs"
 
 [dependencies]
 g3 = "0.1.4"
-geometric_algebra = "0.2.1"
+geometric_algebra = { path = "geometric_algebra" }
 itertools = "0.10.5"
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
 rand = "0.8.5"

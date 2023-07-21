@@ -1,0 +1,9 @@
+[package]
+name = "geometric_algebra"
+version = "0.2.1"
+authors = ["Alexander Meißner <AlexanderMeissner@gmx.net>"]
+description = "Generate(d) custom libraries for geometric algebras"
+repository = "https://github.com/Lichtso/geometric_algebra/"
+keywords = ["math", "simd", "vector", "geometric-algebra", "geometry"]
+license = "MIT"
+edition = "2018"
