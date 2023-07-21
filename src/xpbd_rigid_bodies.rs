@@ -179,6 +179,20 @@ impl InertiaMap {
     }
 }
 
+trait ToGlam {
+    type Output;
+    fn to_glam(&self) -> Self::Output;
+}
+
+impl ToGlam for ppga3d::Point {
+    type Output = glam::Vec3;
+    fn to_glam(&self) -> glam::Vec3 {
+        let g = self.group0();
+        glam::Vec3::new(g[1], g[2], g[3]) / g[0]
+    }
+}
+const ORIGIN: ppga3d::Point = ppga3d::Point::new(1.0, 0.0, 0.0, 0.0);
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dt = 0.001;
     let inertia_map = InertiaMap::new(0.1, vec3(0.1, 0.1, 0.1));
@@ -288,68 +302,71 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .map(|(m, b)| *m + m.geometric_product(*b).scale(-0.5 * dt))
             .collect::<Vec<_>>();
 
-        // // Resolve collisions
-        // for (p, c) in points_next.iter_mut().zip(&mut active_collisions) {
-        //     let d2 = p.length_squared();
-        //     if d2 < inner_r2 {
-        //         let length = p.length();
-        //         *p *= inner_r / length;
-        //         let stiction_d = (inner_r - length) * stiction_factor;
-        //         let stiction_d2 = stiction_d * stiction_d;
-        //         if let Some(Contact {
-        //             point: contact_point,
-        //             state: contact_state,
-        //         }) = c
-        //         {
-        //             if p.distance_squared(*contact_point) > stiction_d2 {
-        //                 let delta = *p - *contact_point;
-        //                 *p -= delta * (stiction_d * delta.length_recip());
-        //                 *p *= inner_r / p.length();
-        //                 *contact_point = *p;
-        //                 *contact_state = ContactState::Sliding;
-        //             } else {
-        //                 *p = *contact_point;
-        //                 *contact_state = ContactState::Sticking;
-        //             }
-        //         } else {
-        //             *c = Some(Contact {
-        //                 point: *p,
-        //                 state: ContactState::New,
-        //             });
-        //         }
-        //     } else if d2 > outer_r2 {
-        //         let length = p.length();
-        //         *p *= outer_r / length;
-        //         let stiction_d = (length - outer_r) * stiction_factor;
-        //         let stiction_d2 = stiction_d * stiction_d;
-        //         if let Some(Contact {
-        //             point: contact_point,
-        //             state: contact_state,
-        //         }) = c
-        //         {
-        //             if p.distance_squared(*contact_point) > stiction_d2 {
-        //                 let delta = *p - *contact_point;
-        //                 *p -= delta * (stiction_d * delta.length_recip());
-        //                 *p *= outer_r / p.length();
-        //                 *contact_point = *p;
-        //                 *contact_state = ContactState::Sliding;
-        //             } else {
-        //                 *p = *contact_point;
-        //                 *contact_state = ContactState::Sticking;
-        //             }
-        //         } else {
-        //             *c = Some(Contact {
-        //                 point: *p,
-        //                 state: ContactState::New,
-        //             });
-        //         }
-        //     } else {
-        //         *c = None;
-        //     }
-        //     // if p.z < -r {
-        //     //     p.z = -r;
-        //     // }
-        // }
+        // Resolve collisions
+        for (m, c) in motors_next.iter_mut().zip(&mut active_collisions) {
+            let mut p = m.transformation(ORIGIN).to_glam();
+            let d2 = p.length_squared();
+            if d2 < inner_r2 {
+                let length = p.length();
+                p *= inner_r / length;
+                let stiction_d = (inner_r - length) * stiction_factor;
+                let stiction_d2 = stiction_d * stiction_d;
+                if let Some(Contact {
+                    point: contact_point,
+                    state: contact_state,
+                }) = c
+                {
+                    if p.distance_squared(*contact_point) > stiction_d2 {
+                        let delta = p - *contact_point;
+                        p -= delta * (stiction_d * delta.length_recip());
+                        p *= inner_r / p.length();
+                        *contact_point = p;
+                        *contact_state = ContactState::Sliding;
+                    } else {
+                        p = *contact_point;
+                        *contact_state = ContactState::Sticking;
+                    }
+                } else {
+                    *c = Some(Contact {
+                        point: p,
+                        state: ContactState::New,
+                    });
+                }
+            } else if d2 > outer_r2 {
+                let length = p.length();
+                p *= outer_r / length;
+                let stiction_d = (length - outer_r) * stiction_factor;
+                let stiction_d2 = stiction_d * stiction_d;
+                if let Some(Contact {
+                    point: contact_point,
+                    state: contact_state,
+                }) = c
+                {
+                    if p.distance_squared(*contact_point) > stiction_d2 {
+                        let delta = p - *contact_point;
+                        p -= delta * (stiction_d * delta.length_recip());
+                        p *= outer_r / p.length();
+                        *contact_point = p;
+                        *contact_state = ContactState::Sliding;
+                    } else {
+                        p = *contact_point;
+                        *contact_state = ContactState::Sticking;
+                    }
+                } else {
+                    *c = Some(Contact {
+                        point: p,
+                        state: ContactState::New,
+                    });
+                }
+            } else {
+                *c = None;
+            }
+            // if p.z < -r {
+            //     p.z = -r;
+            // }
+            let t = -0.5 * (p - m.transformation(ORIGIN).to_glam());
+            *m = ppga3d::Translator::new(1.0, t.x, t.y, t.z).geometric_product(*m);
+        }
 
         // // Resolve constraints
         // for constraint in &compliant_fixed_angle_constraints {
@@ -447,7 +464,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .iter()
             .zip(&motors_curr)
             .map(|(next, curr)| {
-                Into::<ppga3d::Line>::into(next.reversal().transformation((*next - *curr)))
+                Into::<ppga3d::Line>::into(next.reversal().transformation(*next - *curr))
                     .scale(-2.0 / dt)
             })
             .collect::<Vec<_>>();
@@ -456,11 +473,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let positions = motors_curr
             .iter()
-            .map(|m| {
-                let p = m.transformation(ppga3d::Point::new(1.0, 0.0, 0.0, 0.0));
-                let g = p.group0();
-                Vec3D::new(g[1] / g[0], g[2] / g[0], g[3] / g[0])
-            })
+            .map(|m| m.transformation(ORIGIN).to_glam().into())
             .collect::<Vec<Vec3D>>();
         let rotations = motors_curr
             .iter()
