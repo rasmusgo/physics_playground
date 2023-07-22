@@ -288,7 +288,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let d_b = inertia_map.momentum_to_rate(
                 forques
                     - Into::<ppga3d::Line>::into(
-                        -momentum.geometric_product(*b) - b.geometric_product(momentum),
+                        momentum.geometric_product(*b) - b.geometric_product(momentum),
                     )
                     .scale(0.5),
             );
