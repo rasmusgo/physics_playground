@@ -204,14 +204,35 @@ impl ToPpgaPoint for glam::Vec3 {
     }
 }
 
+trait ToPpgaTranslator {
+    type Output;
+    fn to_ppga_translator(&self) -> Self::Output;
+}
+
+impl ToPpgaTranslator for glam::Vec3 {
+    type Output = ppga3d::Translator;
+    fn to_ppga_translator(&self) -> ppga3d::Translator {
+        ppga3d::Translator::new(1.0, self.x * -0.5, self.y * -0.5, self.z * -0.5)
+    }
+}
+
 const ORIGIN: ppga3d::Point = ppga3d::Point::new(1.0, 0.0, 0.0, 0.0);
+
+#[test]
+fn glam_vec_as_translator() {
+    let v = vec3(1.0, 2.0, 3.0);
+    let t = v.to_ppga_translator();
+    let p = t.transformation(ORIGIN);
+    let p = p.to_glam();
+    assert_eq!(p, v);
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dt = 0.001;
     let inertia_map = InertiaMap::new(0.1, vec3(0.1, 0.1, 0.1));
     let offset_x = 0.1;
     let positional_compliance = 0.0001001;
-    let angular_compliance = 0.01;
+    let angular_compliance = 0.001;
     let stiction_factor = 0.25; // Maximum tangential correction per correction along normal.
 
     let recording =
@@ -288,6 +309,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .collect::<Vec<_>>();
 
     let mut rate_in_body = vec![ppga3d::Line::zero(); points_curr.len()];
+    // let mut rate_in_body = vec![ppga3d::Line::new(0.0, 0.0, 0.0, 1.0, 0.0, 0.0); points_curr.len()];
     let mut active_collisions = Vec::<Option<Contact>>::new();
     active_collisions.resize_with(points_curr.len(), Default::default);
     for i in 0..5000 {
@@ -312,7 +334,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut motors_next = motors_curr
             .iter()
             .zip(rate_in_body.iter())
-            .map(|(m, b)| *m + m.geometric_product(*b).scale(-0.5 * dt))
+            .map(|(m, b)| {
+                let m_next = *m + m.geometric_product(*b).scale(-0.5 * dt);
+                m_next.geometric_quotient(m_next.magnitude())
+            })
             .collect::<Vec<_>>();
 
         // Resolve collisions
@@ -382,54 +407,73 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         // Resolve constraints
+        // for constraint in &compliant_fixed_angle_constraints {
+        //     let node_a = constraint.node_a;
+        //     let node_b = constraint.node_b;
+        //     let motor1 = motors_next[node_a];
+        //     let motor2 = motors_next[node_b];
+        //     let p1_in_world = motor1.transformation(constraint.point_in_a.to_ppga_point());
+        //     let p2_in_world = motor2.transformation(constraint.point_in_b.to_ppga_point());
+        //     let join_line = p1_in_world.regressive_product(p2_in_world);
+        //     let c: f32 = join_line.magnitude().into();
+        //     if c <= 0.0 {
+        //         continue;
+        //     }
+        //     let n_in_world = join_line.scale(1.0 / c);
+        //     let n_in_a = motor1.reversal().transformation(n_in_world);
+        //     let n_in_b = motor2.reversal().transformation(n_in_world);
+        //     let s_in_a = inertia_map.momentum_to_rate(n_in_a);
+        //     let s_in_b = inertia_map.momentum_to_rate(n_in_b);
+        //     let w1: f32 = s_in_a.regressive_product(n_in_a).into();
+        //     let w2: f32 = s_in_b.regressive_product(n_in_b).into();
+        //     let correction = -c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
+        //     let u_in_a = s_in_a.scale(-correction);
+        //     let u_in_b = s_in_b.scale(correction);
+        //     motors_next[node_a] -= motor1.geometric_product(u_in_a).scale(0.5);
+        //     motors_next[node_b] -= motor2.geometric_product(u_in_b).scale(0.5);
+        //     motors_next[node_a] =
+        //         motors_next[node_a].geometric_product(motors_next[node_a].magnitude().inverse());
+        //     motors_next[node_b] =
+        //         motors_next[node_b].geometric_product(motors_next[node_b].magnitude().inverse());
+        // }
         for constraint in &compliant_fixed_angle_constraints {
             let node_a = constraint.node_a;
             let node_b = constraint.node_b;
             let motor1 = motors_next[node_a];
             let motor2 = motors_next[node_b];
-            let p1_in_world = motor1.transformation(constraint.point_in_a.to_ppga_point());
-            let p2_in_world = motor2.transformation(constraint.point_in_b.to_ppga_point());
-            let join_line = p1_in_world.regressive_product(p2_in_world);
-            let c: f32 = join_line.magnitude().into();
-            if c <= 0.0 {
+            let a_from_anchor_a = constraint.point_in_a.to_ppga_translator();
+            let b_from_anchor_b = constraint.point_in_b.to_ppga_translator();
+            let world_from_anchor_a = motor1.geometric_product(a_from_anchor_a);
+            let world_from_anchor_b = motor2.geometric_product(b_from_anchor_b);
+            let anchor_a_from_anchor_b = world_from_anchor_a
+                .reversal()
+                .geometric_product(world_from_anchor_b);
+            let meet_line_in_anchor_a = anchor_a_from_anchor_b.ln();
+            let join_line_in_anchor_a = meet_line_in_anchor_a.dual();
+            let c: f32 = join_line_in_anchor_a.magnitude().into();
+            if c == 0.0 {
                 continue;
             }
-            let n_in_world = join_line.scale(1.0 / c);
-            let n_in_a = motor1.reversal().transformation(n_in_world);
-            let n_in_b = motor2.reversal().transformation(n_in_world);
+            let n_in_anchor_a = join_line_in_anchor_a.scale(1.0 / c);
+            let b_from_anchor_a =
+                b_from_anchor_b.geometric_product(anchor_a_from_anchor_b.reversal());
+            let a_from_anchor_a = (ppga3d::Motor::one().geometric_product(a_from_anchor_a));
+            let n_in_a = a_from_anchor_a.transformation(n_in_anchor_a);
+            let n_in_b = b_from_anchor_a.transformation(n_in_anchor_a);
             let s_in_a = inertia_map.momentum_to_rate(n_in_a);
             let s_in_b = inertia_map.momentum_to_rate(n_in_b);
             let w1: f32 = s_in_a.regressive_product(n_in_a).into();
             let w2: f32 = s_in_b.regressive_product(n_in_b).into();
-            let correction = -c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
+            let correction = c / (w1 + w2 + constraint.angular_compliance / (dt * dt));
             let u_in_a = s_in_a.scale(-correction);
             let u_in_b = s_in_b.scale(correction);
             motors_next[node_a] -= motor1.geometric_product(u_in_a).scale(0.5);
             motors_next[node_b] -= motor2.geometric_product(u_in_b).scale(0.5);
             motors_next[node_a] =
-                motors_next[node_a].geometric_product(motors_next[node_a].magnitude().inverse());
+                motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
             motors_next[node_b] =
-                motors_next[node_b].geometric_product(motors_next[node_b].magnitude().inverse());
+                motors_next[node_b].geometric_quotient(motors_next[node_b].magnitude());
         }
-        // // for constraint in &compliant_fixed_angle_constraints {
-        // //     let node_a = constraint.node_a;
-        // //     let node_b = constraint.node_b;
-        // //     let stage_from_a = orientations_next[node_a];
-        // //     let stage_from_b = orientations_next[node_b];
-        // //     let stage_from_wanted_b = stage_from_a * constraint.b_in_a;
-        // //     let delta = stage_from_b * stage_from_wanted_b.inverse();
-        // //     let (axis, mut angle) = delta.to_axis_angle();
-        // //     if angle > PI {
-        // //         angle -= TAU;
-        // //     }
-        // //     let (s, c) =
-        // //         (angle * 0.5 / (2.0 + constraint.angular_compliance / (dt * dt))).sin_cos();
-        // //     let v = axis * s;
-        // //     let delta1 = Quat::from_xyzw(v.x, v.y, v.z, c).normalize();
-        // //     let delta2 = Quat::from_xyzw(-v.x, -v.y, -v.z, c).normalize();
-        // //     orientations_next[node_a] = delta1 * orientations_next[node_a];
-        // //     orientations_next[node_b] = delta2 * orientations_next[node_b];
-        // // }
         // for constraint in &compliant_fixed_angle_constraints {
         //     let node_a = constraint.node_a;
         //     let node_b = constraint.node_b;
@@ -478,7 +522,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .iter()
             .map(|m| {
                 let g = m.group0();
-                Quaternion::new(g[1], g[2], g[3], g[0])
+                Quaternion::new(g[1], g[2], g[3], -g[0])
             })
             .collect::<Vec<Quaternion>>();
         let collisions = active_collisions
@@ -572,10 +616,3 @@ fn test_angular_constraint() {
         assert!(axis.length() > 1.0 - 0.00001);
     }
 }
-
-// #[test]
-// fn line_scalar_mul() {
-//     let line = ppga3d::Line::new(1., 2., 3., 4., 5., 6.);
-//     let scalar = ppga3d::Scalar::new(2.);
-//     line * scalar;
-// }
