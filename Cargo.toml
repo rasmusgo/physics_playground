@@ -30,8 +30,13 @@ g3 = "0.1.4"
 geometric_algebra = { path = "geometric_algebra" }
 itertools = "0.10.5"
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
+puffin = "0.16.0"
+puffin_http = "0.13.0"
 rand = "0.8.5"
-rerun = "0.7"
+rerun = { version = "0.7", default-features = false, features = [
+    "sdk",
+    "glam",
+] }
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]
