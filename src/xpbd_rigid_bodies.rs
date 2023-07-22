@@ -464,7 +464,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .iter()
             .zip(&motors_curr)
             .map(|(next, curr)| {
-                Into::<ppga3d::Line>::into(next.reversal().transformation(*next - *curr))
+                Into::<ppga3d::Line>::into(next.reversal().geometric_product(*next - *curr))
                     .scale(-2.0 / dt)
             })
             .collect::<Vec<_>>();
