@@ -47,6 +47,7 @@ impl epga1d::ComplexNumber {
 impl Exp for epga1d::ComplexNumber {
     type Output = Self;
 
+    #[inline(always)]
     fn exp(self) -> Self {
         Self::from_polar(self[0].exp(), self[1])
     }
@@ -55,6 +56,7 @@ impl Exp for epga1d::ComplexNumber {
 impl Ln for epga1d::ComplexNumber {
     type Output = Self;
 
+    #[inline(always)]
     fn ln(self) -> Self {
         Self::new(self.magnitude()[0].ln(), self.arg())
     }
@@ -71,6 +73,7 @@ impl Powf for epga1d::ComplexNumber {
 impl Exp for ppga2d::IdealPoint {
     type Output = ppga2d::Translator;
 
+    #[inline(always)]
     fn exp(self) -> ppga2d::Translator {
         ppga2d::Translator::new(1.0, self[0], self[1])
     }
@@ -79,6 +82,7 @@ impl Exp for ppga2d::IdealPoint {
 impl Ln for ppga2d::Translator {
     type Output = ppga2d::IdealPoint;
 
+    #[inline(always)]
     fn ln(self) -> ppga2d::IdealPoint {
         let result: ppga2d::IdealPoint = self.into();
         result.scale(1.0 / self[0])
@@ -96,6 +100,7 @@ impl Powf for ppga2d::Translator {
 impl Exp for ppga2d::Point {
     type Output = ppga2d::Motor;
 
+    #[inline(always)]
     fn exp(self) -> ppga2d::Motor {
         let det = self[0] * self[0];
         if det <= 0.0 {
@@ -112,6 +117,7 @@ impl Exp for ppga2d::Point {
 impl Ln for ppga2d::Motor {
     type Output = ppga2d::Point;
 
+    #[inline(always)]
     fn ln(self) -> ppga2d::Point {
         let det = 1.0 - self[0] * self[0];
         if det <= 0.0 {
@@ -135,6 +141,7 @@ impl Powf for ppga2d::Motor {
 impl Exp for ppga3d::IdealPoint {
     type Output = ppga3d::Translator;
 
+    #[inline(always)]
     fn exp(self) -> ppga3d::Translator {
         ppga3d::Translator::new(1.0, self[0], self[1], self[2])
     }
@@ -143,6 +150,7 @@ impl Exp for ppga3d::IdealPoint {
 impl Ln for ppga3d::Translator {
     type Output = ppga3d::IdealPoint;
 
+    #[inline(always)]
     fn ln(self) -> ppga3d::IdealPoint {
         let result: ppga3d::IdealPoint = self.into();
         result.scale(1.0 / self[0])
@@ -160,6 +168,7 @@ impl Powf for ppga3d::Translator {
 impl Exp for ppga3d::Line {
     type Output = ppga3d::Motor;
 
+    #[inline(always)]
     fn exp(self) -> ppga3d::Motor {
         let det = self[3] * self[3] + self[4] * self[4] + self[5] * self[5];
         if det <= 0.0 {
@@ -179,6 +188,7 @@ impl Exp for ppga3d::Line {
 impl Ln for ppga3d::Motor {
     type Output = ppga3d::Line;
 
+    #[inline(always)]
     fn ln(self) -> ppga3d::Line {
         let det = 1.0 - self[0] * self[0];
         if det <= 0.0 {

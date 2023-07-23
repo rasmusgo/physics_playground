@@ -1584,12 +1584,14 @@ impl Conjugation for MultiVector {
 impl Dual for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn dual(self) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group3(), g1: self.group2() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g2: self.group1() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g3: self.group0() } }
     }
 }
 
 impl Into<Scalar> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] } }
     }
@@ -1806,6 +1808,7 @@ impl ScalarProduct<MultiVector> for MultiVector {
 }
 
 impl Into<Rotor> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() } }
     }
@@ -1886,6 +1889,7 @@ impl ScalarProduct<Rotor> for MultiVector {
 }
 
 impl Into<Point> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Point {
         Point { groups: PointGroups { g0: Simd32x4::from([self.group2()[0], self.group1()[1], self.group1()[2], self.group1()[3]]) } }
     }
@@ -1942,6 +1946,7 @@ impl ScalarProduct<Point> for MultiVector {
 }
 
 impl Into<IdealPoint> for MultiVector {
+    #[inline(always)]
     fn into(self) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: Simd32x3::from([self.group3()[1], self.group3()[2], self.group3()[3]]) } }
     }
@@ -1980,6 +1985,7 @@ impl SubAssign<IdealPoint> for MultiVector {
 }
 
 impl Into<Plane> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from([self.group1()[0], self.group2()[1], self.group2()[2], self.group2()[3]]) } }
     }
@@ -2036,6 +2042,7 @@ impl ScalarProduct<Plane> for MultiVector {
 }
 
 impl Into<Line> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Line {
         Line { groups: LineGroups { g0: Simd32x3::from([self.group3()[1], self.group3()[2], self.group3()[3]]), g1: Simd32x3::from([self.group0()[1], self.group0()[2], self.group0()[3]]) } }
     }
@@ -2092,6 +2099,7 @@ impl ScalarProduct<Line> for MultiVector {
 }
 
 impl Into<Translator> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group3()[1], self.group3()[2], self.group3()[3]]) } }
     }
@@ -2172,6 +2180,7 @@ impl ScalarProduct<Translator> for MultiVector {
 }
 
 impl Into<Motor> for MultiVector {
+    #[inline(always)]
     fn into(self) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0(), g1: self.group3() } }
     }
@@ -2261,6 +2270,7 @@ impl ScalarProduct<Motor> for MultiVector {
 }
 
 impl Into<PointAndPlane> for MultiVector {
+    #[inline(always)]
     fn into(self) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from([self.group2()[0], self.group1()[1], self.group1()[2], self.group1()[3]]), g1: Simd32x4::from([self.group1()[0], self.group2()[1], self.group2()[2], self.group2()[3]]) } }
     }
@@ -2406,6 +2416,7 @@ impl Conjugation for Rotor {
 }
 
 impl Into<Scalar> for Rotor {
+    #[inline(always)]
     fn into(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] } }
     }
@@ -3042,6 +3053,7 @@ impl Conjugation for Point {
 impl Dual for Point {
     type Output = Plane;
 
+    #[inline(always)]
     fn dual(self) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() * Simd32x4::from(-1.0) } }
     }
@@ -3904,6 +3916,7 @@ impl Conjugation for Plane {
 impl Dual for Plane {
     type Output = Point;
 
+    #[inline(always)]
     fn dual(self) -> Point {
         Point { groups: PointGroups { g0: self.group0() } }
     }
@@ -4383,6 +4396,7 @@ impl Conjugation for Line {
 impl Dual for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn dual(self) -> Line {
         Line { groups: LineGroups { g0: self.group1(), g1: self.group0() } }
     }
@@ -4518,6 +4532,7 @@ impl LeftContraction<Point> for Line {
 }
 
 impl Into<IdealPoint> for Line {
+    #[inline(always)]
     fn into(self) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() } }
     }
@@ -4917,6 +4932,7 @@ impl Conjugation for Translator {
 }
 
 impl Into<Scalar> for Translator {
+    #[inline(always)]
     fn into(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] } }
     }
@@ -5158,6 +5174,7 @@ impl LeftContraction<Point> for Translator {
 }
 
 impl Into<IdealPoint> for Translator {
+    #[inline(always)]
     fn into(self) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: Simd32x3::from([self.group0()[1], self.group0()[2], self.group0()[3]]) } }
     }
@@ -5590,12 +5607,14 @@ impl Conjugation for Motor {
 impl Dual for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn dual(self) -> Motor {
         Motor { groups: MotorGroups { g0: self.group1(), g1: self.group0() } }
     }
 }
 
 impl Into<Scalar> for Motor {
+    #[inline(always)]
     fn into(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] } }
     }
@@ -5762,6 +5781,7 @@ impl ScalarProduct<MultiVector> for Motor {
 }
 
 impl Into<Rotor> for Motor {
+    #[inline(always)]
     fn into(self) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() } }
     }
@@ -5901,6 +5921,7 @@ impl LeftContraction<Point> for Motor {
 }
 
 impl Into<IdealPoint> for Motor {
+    #[inline(always)]
     fn into(self) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: Simd32x3::from([self.group1()[1], self.group1()[2], self.group1()[3]]) } }
     }
@@ -5998,6 +6019,7 @@ impl LeftContraction<Plane> for Motor {
 }
 
 impl Into<Line> for Motor {
+    #[inline(always)]
     fn into(self) -> Line {
         Line { groups: LineGroups { g0: Simd32x3::from([self.group1()[1], self.group1()[2], self.group1()[3]]), g1: Simd32x3::from([self.group0()[1], self.group0()[2], self.group0()[3]]) } }
     }
@@ -6062,6 +6084,7 @@ impl ScalarProduct<Line> for Motor {
 }
 
 impl Into<Translator> for Motor {
+    #[inline(always)]
     fn into(self) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]) } }
     }
@@ -6429,6 +6452,7 @@ impl Conjugation for PointAndPlane {
 impl Dual for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn dual(self) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group1(), g1: self.group0() * Simd32x4::from(-1.0) } }
     }
@@ -6537,6 +6561,7 @@ impl RightContraction<Rotor> for PointAndPlane {
 }
 
 impl Into<Point> for PointAndPlane {
+    #[inline(always)]
     fn into(self) -> Point {
         Point { groups: PointGroups { g0: self.group0() } }
     }
@@ -6610,6 +6635,7 @@ impl RegressiveProduct<IdealPoint> for PointAndPlane {
 }
 
 impl Into<Plane> for PointAndPlane {
+    #[inline(always)]
     fn into(self) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group1() } }
     }
