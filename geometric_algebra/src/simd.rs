@@ -13,17 +13,32 @@ pub use std::arch::x86_64::*;
 #[repr(C)]
 pub union Simd32x4 {
     // Intel / AMD
-    #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        target_feature = "sse2"
+    ))]
     pub f128: __m128,
-    #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        target_feature = "sse2"
+    ))]
     pub i128: __m128i,
 
     // ARM
-    #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))]
+    #[cfg(all(
+        any(target_arch = "arm", target_arch = "aarch64"),
+        target_feature = "neon"
+    ))]
     pub f128: float32x4_t,
-    #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))]
+    #[cfg(all(
+        any(target_arch = "arm", target_arch = "aarch64"),
+        target_feature = "neon"
+    ))]
     pub i128: int32x4_t,
-    #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))]
+    #[cfg(all(
+        any(target_arch = "arm", target_arch = "aarch64"),
+        target_feature = "neon"
+    ))]
     pub u128: uint32x4_t,
 
     // Web
@@ -137,6 +152,7 @@ macro_rules! swizzle {
 impl std::ops::Index<usize> for Simd32x4 {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.f32x4[index] }
     }
@@ -145,6 +161,7 @@ impl std::ops::Index<usize> for Simd32x4 {
 impl std::ops::Index<usize> for Simd32x3 {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.f32x3[index] }
     }
@@ -153,66 +170,77 @@ impl std::ops::Index<usize> for Simd32x3 {
 impl std::ops::Index<usize> for Simd32x2 {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.f32x2[index] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Simd32x4 {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.f32x4[index] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Simd32x3 {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.f32x3[index] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Simd32x2 {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.f32x2[index] }
     }
 }
 
 impl std::convert::From<Simd32x4> for [f32; 4] {
+    #[inline(always)]
     fn from(simd: Simd32x4) -> Self {
         unsafe { simd.f32x4 }
     }
 }
 
 impl std::convert::From<Simd32x3> for [f32; 3] {
+    #[inline(always)]
     fn from(simd: Simd32x3) -> Self {
         unsafe { simd.f32x3 }
     }
 }
 
 impl std::convert::From<Simd32x2> for [f32; 2] {
+    #[inline(always)]
     fn from(simd: Simd32x2) -> Self {
         unsafe { simd.f32x2 }
     }
 }
 
 impl std::convert::From<[f32; 4]> for Simd32x4 {
+    #[inline(always)]
     fn from(f32x4: [f32; 4]) -> Self {
         Self { f32x4 }
     }
 }
 
 impl std::convert::From<[f32; 3]> for Simd32x3 {
+    #[inline(always)]
     fn from(f32x3: [f32; 3]) -> Self {
         Self { f32x3 }
     }
 }
 
 impl std::convert::From<[f32; 2]> for Simd32x2 {
+    #[inline(always)]
     fn from(f32x2: [f32; 2]) -> Self {
         Self { f32x2 }
     }
 }
 
 impl std::convert::From<f32> for Simd32x4 {
+    #[inline(always)]
     fn from(value: f32) -> Self {
         Self {
             f32x4: [value, value, value, value],
@@ -221,6 +249,7 @@ impl std::convert::From<f32> for Simd32x4 {
 }
 
 impl std::convert::From<f32> for Simd32x3 {
+    #[inline(always)]
     fn from(value: f32) -> Self {
         Self {
             f32x3: [value, value, value],
@@ -229,6 +258,7 @@ impl std::convert::From<f32> for Simd32x3 {
 }
 
 impl std::convert::From<f32> for Simd32x2 {
+    #[inline(always)]
     fn from(value: f32) -> Self {
         Self {
             f32x2: [value, value],
@@ -266,6 +296,7 @@ impl std::fmt::Debug for Simd32x2 {
 impl std::ops::Add<Simd32x4> for Simd32x4 {
     type Output = Simd32x4;
 
+    #[inline(always)]
     fn add(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -285,6 +316,7 @@ impl std::ops::Add<Simd32x4> for Simd32x4 {
 impl std::ops::Add<Simd32x3> for Simd32x3 {
     type Output = Simd32x3;
 
+    #[inline(always)]
     fn add(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -301,6 +333,7 @@ impl std::ops::Add<Simd32x3> for Simd32x3 {
 impl std::ops::Add<Simd32x2> for Simd32x2 {
     type Output = Simd32x2;
 
+    #[inline(always)]
     fn add(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -316,6 +349,7 @@ impl std::ops::Add<Simd32x2> for Simd32x2 {
 impl std::ops::Sub<Simd32x4> for Simd32x4 {
     type Output = Simd32x4;
 
+    #[inline(always)]
     fn sub(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -335,6 +369,7 @@ impl std::ops::Sub<Simd32x4> for Simd32x4 {
 impl std::ops::Sub<Simd32x3> for Simd32x3 {
     type Output = Simd32x3;
 
+    #[inline(always)]
     fn sub(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -351,6 +386,7 @@ impl std::ops::Sub<Simd32x3> for Simd32x3 {
 impl std::ops::Sub<Simd32x2> for Simd32x2 {
     type Output = Simd32x2;
 
+    #[inline(always)]
     fn sub(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -366,6 +402,7 @@ impl std::ops::Sub<Simd32x2> for Simd32x2 {
 impl std::ops::Mul<Simd32x4> for Simd32x4 {
     type Output = Simd32x4;
 
+    #[inline(always)]
     fn mul(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -385,6 +422,7 @@ impl std::ops::Mul<Simd32x4> for Simd32x4 {
 impl std::ops::Mul<Simd32x3> for Simd32x3 {
     type Output = Simd32x3;
 
+    #[inline(always)]
     fn mul(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -401,6 +439,7 @@ impl std::ops::Mul<Simd32x3> for Simd32x3 {
 impl std::ops::Mul<Simd32x2> for Simd32x2 {
     type Output = Simd32x2;
 
+    #[inline(always)]
     fn mul(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -416,6 +455,7 @@ impl std::ops::Mul<Simd32x2> for Simd32x2 {
 impl std::ops::Div<Simd32x4> for Simd32x4 {
     type Output = Simd32x4;
 
+    #[inline(always)]
     fn div(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -435,6 +475,7 @@ impl std::ops::Div<Simd32x4> for Simd32x4 {
 impl std::ops::Div<Simd32x3> for Simd32x3 {
     type Output = Simd32x3;
 
+    #[inline(always)]
     fn div(self, other: Self) -> Self {
         match_architecture!(
             Self,
@@ -451,6 +492,7 @@ impl std::ops::Div<Simd32x3> for Simd32x3 {
 impl std::ops::Div<Simd32x2> for Simd32x2 {
     type Output = Simd32x2;
 
+    #[inline(always)]
     fn div(self, other: Self) -> Self {
         match_architecture!(
             Self,

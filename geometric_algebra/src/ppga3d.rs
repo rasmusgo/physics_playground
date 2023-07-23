@@ -21,6 +21,7 @@ impl Scalar {
     pub const fn new(value: f32) -> Self {
         Self { elements: [value] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: f32) -> Self {
         Self { groups: ScalarGroups { g0 } }
     }
@@ -39,36 +40,42 @@ const SCALAR_INDEX_REMAP: [usize; 1] = [0];
 impl std::ops::Index<usize> for Scalar {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[SCALAR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Scalar {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[SCALAR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Scalar> for [f32; 1] {
+    #[inline(always)]
     fn from(vector: Scalar) -> Self {
         unsafe { [vector.elements[0]] }
     }
 }
 
 impl std::convert::From<[f32; 1]> for Scalar {
+    #[inline(always)]
     fn from(array: [f32; 1]) -> Self {
         Self { elements: [array[0]] }
     }
 }
 
 impl std::convert::From<Scalar> for f32 {
+    #[inline(always)]
     fn from(vector: Scalar) -> Self {
         unsafe { vector.elements[0] }
     }
 }
 
 impl std::convert::From<f32> for Scalar {
+    #[inline(always)]
     fn from(value: f32) -> Self {
         Self { elements: [value] }
     }
@@ -108,6 +115,7 @@ impl MultiVector {
     pub const fn new(one: f32, e23: f32, e31: f32, e12: f32, e0: f32, e032: f32, e013: f32, e021: f32, e123: f32, e1: f32, e2: f32, e3: f32, e0123: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e23, e31, e12, e0, e032, e013, e021, e123, e1, e2, e3, e0123, e01, e02, e03] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4, g1: Simd32x4, g2: Simd32x4, g3: Simd32x4) -> Self {
         Self { groups: MultiVectorGroups { g0, g1, g2, g3 } }
     }
@@ -150,24 +158,28 @@ const MULTIVECTOR_INDEX_REMAP: [usize; 16] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
 impl std::ops::Index<usize> for MultiVector {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[MULTIVECTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for MultiVector {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[MULTIVECTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<MultiVector> for [f32; 16] {
+    #[inline(always)]
     fn from(vector: MultiVector) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3], vector.elements[4], vector.elements[5], vector.elements[6], vector.elements[7], vector.elements[8], vector.elements[9], vector.elements[10], vector.elements[11], vector.elements[12], vector.elements[13], vector.elements[14], vector.elements[15]] }
     }
 }
 
 impl std::convert::From<[f32; 16]> for MultiVector {
+    #[inline(always)]
     fn from(array: [f32; 16]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7], array[8], array[9], array[10], array[11], array[12], array[13], array[14], array[15]] }
     }
@@ -216,6 +228,7 @@ impl Rotor {
     pub const fn new(one: f32, e32: f32, e31: f32, e12: f32) -> Self {
         Self { elements: [one, e32, e31, e12] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4) -> Self {
         Self { groups: RotorGroups { g0 } }
     }
@@ -234,24 +247,28 @@ const ROTOR_INDEX_REMAP: [usize; 4] = [0, 1, 2, 3];
 impl std::ops::Index<usize> for Rotor {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[ROTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Rotor {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[ROTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Rotor> for [f32; 4] {
+    #[inline(always)]
     fn from(vector: Rotor) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3]] }
     }
 }
 
 impl std::convert::From<[f32; 4]> for Rotor {
+    #[inline(always)]
     fn from(array: [f32; 4]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3]] }
     }
@@ -288,6 +305,7 @@ impl Point {
     pub const fn new(e123: f32, e032: f32, e013: f32, e021: f32) -> Self {
         Self { elements: [e123, e032, e013, e021] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4) -> Self {
         Self { groups: PointGroups { g0 } }
     }
@@ -306,24 +324,28 @@ const POINT_INDEX_REMAP: [usize; 4] = [0, 1, 2, 3];
 impl std::ops::Index<usize> for Point {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[POINT_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Point {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[POINT_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Point> for [f32; 4] {
+    #[inline(always)]
     fn from(vector: Point) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3]] }
     }
 }
 
 impl std::convert::From<[f32; 4]> for Point {
+    #[inline(always)]
     fn from(array: [f32; 4]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3]] }
     }
@@ -360,6 +382,7 @@ impl IdealPoint {
     pub const fn new(e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [e01, e02, e03, 0.0] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x3) -> Self {
         Self { groups: IdealPointGroups { g0 } }
     }
@@ -378,24 +401,28 @@ const IDEALPOINT_INDEX_REMAP: [usize; 3] = [0, 1, 2];
 impl std::ops::Index<usize> for IdealPoint {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[IDEALPOINT_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for IdealPoint {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[IDEALPOINT_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<IdealPoint> for [f32; 3] {
+    #[inline(always)]
     fn from(vector: IdealPoint) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2]] }
     }
 }
 
 impl std::convert::From<[f32; 3]> for IdealPoint {
+    #[inline(always)]
     fn from(array: [f32; 3]) -> Self {
         Self { elements: [array[0], array[1], array[2], 0.0] }
     }
@@ -431,6 +458,7 @@ impl Plane {
     pub const fn new(e0: f32, e1: f32, e2: f32, e3: f32) -> Self {
         Self { elements: [e0, e1, e2, e3] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4) -> Self {
         Self { groups: PlaneGroups { g0 } }
     }
@@ -449,24 +477,28 @@ const PLANE_INDEX_REMAP: [usize; 4] = [0, 1, 2, 3];
 impl std::ops::Index<usize> for Plane {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[PLANE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Plane {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[PLANE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Plane> for [f32; 4] {
+    #[inline(always)]
     fn from(vector: Plane) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3]] }
     }
 }
 
 impl std::convert::From<[f32; 4]> for Plane {
+    #[inline(always)]
     fn from(array: [f32; 4]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3]] }
     }
@@ -505,6 +537,7 @@ impl Line {
     pub const fn new(e01: f32, e02: f32, e03: f32, e23: f32, e31: f32, e12: f32) -> Self {
         Self { elements: [e01, e02, e03, 0.0, e23, e31, e12, 0.0] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x3, g1: Simd32x3) -> Self {
         Self { groups: LineGroups { g0, g1 } }
     }
@@ -531,24 +564,28 @@ const LINE_INDEX_REMAP: [usize; 6] = [0, 1, 2, 4, 5, 6];
 impl std::ops::Index<usize> for Line {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[LINE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Line {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[LINE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Line> for [f32; 6] {
+    #[inline(always)]
     fn from(vector: Line) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[4], vector.elements[5], vector.elements[6]] }
     }
 }
 
 impl std::convert::From<[f32; 6]> for Line {
+    #[inline(always)]
     fn from(array: [f32; 6]) -> Self {
         Self { elements: [array[0], array[1], array[2], 0.0, array[3], array[4], array[5], 0.0] }
     }
@@ -587,6 +624,7 @@ impl Translator {
     pub const fn new(one: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e01, e02, e03] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4) -> Self {
         Self { groups: TranslatorGroups { g0 } }
     }
@@ -605,24 +643,28 @@ const TRANSLATOR_INDEX_REMAP: [usize; 4] = [0, 1, 2, 3];
 impl std::ops::Index<usize> for Translator {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[TRANSLATOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Translator {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[TRANSLATOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Translator> for [f32; 4] {
+    #[inline(always)]
     fn from(vector: Translator) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3]] }
     }
 }
 
 impl std::convert::From<[f32; 4]> for Translator {
+    #[inline(always)]
     fn from(array: [f32; 4]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3]] }
     }
@@ -661,6 +703,7 @@ impl Motor {
     pub const fn new(one: f32, e23: f32, e31: f32, e12: f32, e0123: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e23, e31, e12, e0123, e01, e02, e03] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4, g1: Simd32x4) -> Self {
         Self { groups: MotorGroups { g0, g1 } }
     }
@@ -687,24 +730,28 @@ const MOTOR_INDEX_REMAP: [usize; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
 impl std::ops::Index<usize> for Motor {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[MOTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for Motor {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[MOTOR_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<Motor> for [f32; 8] {
+    #[inline(always)]
     fn from(vector: Motor) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3], vector.elements[4], vector.elements[5], vector.elements[6], vector.elements[7]] }
     }
 }
 
 impl std::convert::From<[f32; 8]> for Motor {
+    #[inline(always)]
     fn from(array: [f32; 8]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7]] }
     }
@@ -747,6 +794,7 @@ impl PointAndPlane {
     pub const fn new(e123: f32, e032: f32, e013: f32, e021: f32, e0: f32, e1: f32, e2: f32, e3: f32) -> Self {
         Self { elements: [e123, e032, e013, e021, e0, e1, e2, e3] }
     }
+    #[inline(always)]
     pub const fn from_groups(g0: Simd32x4, g1: Simd32x4) -> Self {
         Self { groups: PointAndPlaneGroups { g0, g1 } }
     }
@@ -773,24 +821,28 @@ const POINTANDPLANE_INDEX_REMAP: [usize; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
 impl std::ops::Index<usize> for PointAndPlane {
     type Output = f32;
 
+    #[inline(always)]
     fn index(&self, index: usize) -> &Self::Output {
         unsafe { &self.elements[POINTANDPLANE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::ops::IndexMut<usize> for PointAndPlane {
+    #[inline(always)]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut self.elements[POINTANDPLANE_INDEX_REMAP[index]] }
     }
 }
 
 impl std::convert::From<PointAndPlane> for [f32; 8] {
+    #[inline(always)]
     fn from(vector: PointAndPlane) -> Self {
         unsafe { [vector.elements[0], vector.elements[1], vector.elements[2], vector.elements[3], vector.elements[4], vector.elements[5], vector.elements[6], vector.elements[7]] }
     }
 }
 
 impl std::convert::From<[f32; 8]> for PointAndPlane {
+    #[inline(always)]
     fn from(array: [f32; 8]) -> Self {
         Self { elements: [array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7]] }
     }
@@ -843,6 +895,7 @@ impl Automorphism for Scalar {
 impl Reversal for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn reversal(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() } }
     }
@@ -859,12 +912,14 @@ impl Conjugation for Scalar {
 impl Add<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<Scalar> for Scalar {
+    #[inline(always)]
     fn add_assign(&mut self, other: Scalar) {
         *self = (*self).add(other);
     }
@@ -873,12 +928,14 @@ impl AddAssign<Scalar> for Scalar {
 impl Sub<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<Scalar> for Scalar {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Scalar) {
         *self = (*self).sub(other);
     }
@@ -915,6 +972,7 @@ impl DivAssign<Scalar> for Scalar {
 impl GeometricProduct<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0() } }
     }
@@ -955,6 +1013,7 @@ impl RightContraction<Scalar> for Scalar {
 impl ScalarProduct<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0() } }
     }
@@ -963,6 +1022,7 @@ impl ScalarProduct<Scalar> for Scalar {
 impl Add<MultiVector> for Scalar {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0(), g1: other.group1(), g2: other.group2(), g3: other.group3() } }
     }
@@ -971,6 +1031,7 @@ impl Add<MultiVector> for Scalar {
 impl Sub<MultiVector> for Scalar {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: Simd32x4::from(0.0) - other.group3() } }
     }
@@ -979,6 +1040,7 @@ impl Sub<MultiVector> for Scalar {
 impl GeometricProduct<MultiVector> for Scalar {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()) * other.group0(), g1: Simd32x4::from(self.group0()) * other.group1(), g2: Simd32x4::from(self.group0()) * other.group2(), g3: Simd32x4::from(self.group0()) * other.group3() } }
     }
@@ -987,6 +1049,7 @@ impl GeometricProduct<MultiVector> for Scalar {
 impl RegressiveProduct<MultiVector> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group3()[0] } }
     }
@@ -1027,6 +1090,7 @@ impl RightContraction<MultiVector> for Scalar {
 impl ScalarProduct<MultiVector> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0()[0] } }
     }
@@ -1035,6 +1099,7 @@ impl ScalarProduct<MultiVector> for Scalar {
 impl Add<Rotor> for Scalar {
     type Output = Rotor;
 
+    #[inline(always)]
     fn add(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0() } }
     }
@@ -1043,6 +1108,7 @@ impl Add<Rotor> for Scalar {
 impl Sub<Rotor> for Scalar {
     type Output = Rotor;
 
+    #[inline(always)]
     fn sub(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0() } }
     }
@@ -1051,6 +1117,7 @@ impl Sub<Rotor> for Scalar {
 impl GeometricProduct<Rotor> for Scalar {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group0()) * other.group0() } }
     }
@@ -1091,6 +1158,7 @@ impl RightContraction<Rotor> for Scalar {
 impl ScalarProduct<Rotor> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0()[0] } }
     }
@@ -1099,6 +1167,7 @@ impl ScalarProduct<Rotor> for Scalar {
 impl GeometricProduct<Point> for Scalar {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> Point {
         Point { groups: PointGroups { g0: Simd32x4::from(self.group0()) * other.group0() } }
     }
@@ -1131,6 +1200,7 @@ impl LeftContraction<Point> for Scalar {
 impl Add<IdealPoint> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -1139,6 +1209,7 @@ impl Add<IdealPoint> for Scalar {
 impl Sub<IdealPoint> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -1147,6 +1218,7 @@ impl Sub<IdealPoint> for Scalar {
 impl GeometricProduct<IdealPoint> for Scalar {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_product(self, other: IdealPoint) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: Simd32x3::from(self.group0()) * other.group0() } }
     }
@@ -1179,6 +1251,7 @@ impl LeftContraction<IdealPoint> for Scalar {
 impl GeometricProduct<Plane> for Scalar {
     type Output = Plane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()) * other.group0() } }
     }
@@ -1211,6 +1284,7 @@ impl LeftContraction<Plane> for Scalar {
 impl GeometricProduct<Line> for Scalar {
     type Output = Line;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> Line {
         Line { groups: LineGroups { g0: Simd32x3::from(self.group0()) * other.group0(), g1: Simd32x3::from(self.group0()) * other.group1() } }
     }
@@ -1243,6 +1317,7 @@ impl LeftContraction<Line> for Scalar {
 impl Add<Translator> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0() } }
     }
@@ -1251,6 +1326,7 @@ impl Add<Translator> for Scalar {
 impl Sub<Translator> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0() } }
     }
@@ -1259,6 +1335,7 @@ impl Sub<Translator> for Scalar {
 impl GeometricProduct<Translator> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()) * other.group0() } }
     }
@@ -1299,6 +1376,7 @@ impl RightContraction<Translator> for Scalar {
 impl ScalarProduct<Translator> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0()[0] } }
     }
@@ -1307,6 +1385,7 @@ impl ScalarProduct<Translator> for Scalar {
 impl Add<Motor> for Scalar {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0(), g1: other.group1() } }
     }
@@ -1315,6 +1394,7 @@ impl Add<Motor> for Scalar {
 impl Sub<Motor> for Scalar {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0(), g1: Simd32x4::from(0.0) - other.group1() } }
     }
@@ -1323,6 +1403,7 @@ impl Sub<Motor> for Scalar {
 impl GeometricProduct<Motor> for Scalar {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()) * other.group0(), g1: Simd32x4::from(self.group0()) * other.group1() } }
     }
@@ -1331,6 +1412,7 @@ impl GeometricProduct<Motor> for Scalar {
 impl RegressiveProduct<Motor> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group1()[0] } }
     }
@@ -1371,6 +1453,7 @@ impl RightContraction<Motor> for Scalar {
 impl ScalarProduct<Motor> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0() * other.group0()[0] } }
     }
@@ -1379,6 +1462,7 @@ impl ScalarProduct<Motor> for Scalar {
 impl GeometricProduct<PointAndPlane> for Scalar {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()) * other.group0(), g1: Simd32x4::from(self.group0()) * other.group1() } }
     }
@@ -1411,6 +1495,7 @@ impl LeftContraction<PointAndPlane> for Scalar {
 impl SquaredMagnitude for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -1419,6 +1504,7 @@ impl SquaredMagnitude for Scalar {
 impl Magnitude for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -1427,6 +1513,7 @@ impl Magnitude for Scalar {
 impl Scale for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Scalar {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -1443,6 +1530,7 @@ impl Signum for Scalar {
 impl Inverse for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn inverse(self) -> Scalar {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -1479,6 +1567,7 @@ impl Automorphism for MultiVector {
 impl Reversal for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn reversal(self) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g1: self.group1() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g2: self.group2() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g3: self.group3() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -1509,12 +1598,14 @@ impl Into<Scalar> for MultiVector {
 impl Add<Scalar> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() } }
     }
 }
 
 impl AddAssign<Scalar> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Scalar) {
         *self = (*self).add(other);
     }
@@ -1523,12 +1614,14 @@ impl AddAssign<Scalar> for MultiVector {
 impl Sub<Scalar> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() } }
     }
 }
 
 impl SubAssign<Scalar> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Scalar) {
         *self = (*self).sub(other);
     }
@@ -1537,6 +1630,7 @@ impl SubAssign<Scalar> for MultiVector {
 impl GeometricProduct<Scalar> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() * Simd32x4::from(other.group0()), g1: self.group1() * Simd32x4::from(other.group0()), g2: self.group2() * Simd32x4::from(other.group0()), g3: self.group3() * Simd32x4::from(other.group0()) } }
     }
@@ -1545,6 +1639,7 @@ impl GeometricProduct<Scalar> for MultiVector {
 impl RegressiveProduct<Scalar> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group3()[0] * other.group0() } }
     }
@@ -1585,6 +1680,7 @@ impl RightContraction<Scalar> for MultiVector {
 impl ScalarProduct<Scalar> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0() } }
     }
@@ -1593,12 +1689,14 @@ impl ScalarProduct<Scalar> for MultiVector {
 impl Add<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + other.group0(), g1: self.group1() + other.group1(), g2: self.group2() + other.group2(), g3: self.group3() + other.group3() } }
     }
 }
 
 impl AddAssign<MultiVector> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: MultiVector) {
         *self = (*self).add(other);
     }
@@ -1607,12 +1705,14 @@ impl AddAssign<MultiVector> for MultiVector {
 impl Sub<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - other.group0(), g1: self.group1() - other.group1(), g2: self.group2() - other.group2(), g3: self.group3() - other.group3() } }
     }
 }
 
 impl SubAssign<MultiVector> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: MultiVector) {
         *self = (*self).sub(other);
     }
@@ -1649,6 +1749,7 @@ impl DivAssign<MultiVector> for MultiVector {
 impl GeometricProduct<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[0]) * other.group2() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[0]) * other.group3() + Simd32x4::from(self.group2()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) - Simd32x4::from(self.group3()[0]) * other.group2() + Simd32x4::from(self.group3()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group3()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group2() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group2()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * other.group2() + Simd32x4::from(self.group1()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) - Simd32x4::from(self.group2()[0]) * other.group1() + Simd32x4::from(self.group2()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group3()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -1657,6 +1758,7 @@ impl GeometricProduct<MultiVector> for MultiVector {
 impl RegressiveProduct<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn regressive_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 1, 1) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group2(), 1, 0, 1, 1) * Simd32x4::from([-1.0, -1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group2(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group2(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, -1.0]) + Simd32x4::from(self.group2()[0]) * other.group1() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[1]) * Simd32x4::from(other.group1()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[0]) * other.group0() + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: Simd32x4::from(self.group1()[1]) * swizzle!(other.group3(), 1, 0, 1, 1) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group3(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group3(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group3()[0]) * other.group1() + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group1()[1]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g2: Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 3, 3, 3, 2) * Simd32x4::from([0.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group2()[0]) * other.group3() + Simd32x4::from(self.group2()[2]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group3()[0]) * other.group2() + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([0.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group0()[0], self.group2()[1], self.group0()[1], self.group0()[1]]) * Simd32x4::from([other.group1()[0], other.group3()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group1()[2]) * swizzle!(other.group1(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group1(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group3()[0]) * other.group3() + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[0], self.group3()[1], self.group1()[1], self.group1()[1]]) * Simd32x4::from([other.group1()[0], other.group3()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) } }
     }
@@ -1697,6 +1799,7 @@ impl RightContraction<MultiVector> for MultiVector {
 impl ScalarProduct<MultiVector> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] - self.group2()[0] * other.group2()[0] + self.group2()[1] * other.group2()[1] + self.group2()[2] * other.group2()[2] + self.group2()[3] * other.group2()[3] } }
     }
@@ -1711,12 +1814,14 @@ impl Into<Rotor> for MultiVector {
 impl Add<Rotor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Rotor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + other.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() } }
     }
 }
 
 impl AddAssign<Rotor> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Rotor) {
         *self = (*self).add(other);
     }
@@ -1725,12 +1830,14 @@ impl AddAssign<Rotor> for MultiVector {
 impl Sub<Rotor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Rotor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - other.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() } }
     }
 }
 
 impl SubAssign<Rotor> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Rotor) {
         *self = (*self).sub(other);
     }
@@ -1739,6 +1846,7 @@ impl SubAssign<Rotor> for MultiVector {
 impl GeometricProduct<Rotor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g2: Simd32x4::from(self.group2()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group3()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group3()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -1771,6 +1879,7 @@ impl RightContraction<Rotor> for MultiVector {
 impl ScalarProduct<Rotor> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -1785,12 +1894,14 @@ impl Into<Point> for MultiVector {
 impl Add<Point> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Point) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() + other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g2: self.group2() + Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g3: self.group3() } }
     }
 }
 
 impl AddAssign<Point> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Point) {
         *self = (*self).add(other);
     }
@@ -1799,12 +1910,14 @@ impl AddAssign<Point> for MultiVector {
 impl Sub<Point> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Point) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() - other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g2: self.group2() - Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g3: self.group3() } }
     }
 }
 
 impl SubAssign<Point> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Point) {
         *self = (*self).sub(other);
     }
@@ -1813,6 +1926,7 @@ impl SubAssign<Point> for MultiVector {
 impl GeometricProduct<Point> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group2() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, -1.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, -1.0]) + Simd32x4::from([self.group3()[0], self.group0()[0], self.group0()[0], self.group0()[0]]) * other.group0() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g2: self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group2()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + self.group1() * Simd32x4::from(other.group0()[0]) } }
     }
@@ -1821,6 +1935,7 @@ impl GeometricProduct<Point> for MultiVector {
 impl ScalarProduct<Point> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Point) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group2()[0] * other.group0()[0] } }
     }
@@ -1835,12 +1950,14 @@ impl Into<IdealPoint> for MultiVector {
 impl Add<IdealPoint> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<IdealPoint> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: IdealPoint) {
         *self = (*self).add(other);
     }
@@ -1849,12 +1966,14 @@ impl AddAssign<IdealPoint> for MultiVector {
 impl Sub<IdealPoint> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<IdealPoint> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: IdealPoint) {
         *self = (*self).sub(other);
     }
@@ -1869,12 +1988,14 @@ impl Into<Plane> for MultiVector {
 impl Add<Plane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Plane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() + Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g2: self.group2() + other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g3: self.group3() } }
     }
 }
 
 impl AddAssign<Plane> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Plane) {
         *self = (*self).add(other);
     }
@@ -1883,12 +2004,14 @@ impl AddAssign<Plane> for MultiVector {
 impl Sub<Plane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Plane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() - Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g2: self.group2() - other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g3: self.group3() } }
     }
 }
 
 impl SubAssign<Plane> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Plane) {
         *self = (*self).sub(other);
     }
@@ -1897,6 +2020,7 @@ impl SubAssign<Plane> for MultiVector {
 impl GeometricProduct<Plane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group2()[0]) * other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group3()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group3()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g3: Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([-1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([-1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([-1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group2()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, -1.0, 0.0, 0.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, -1.0]) + Simd32x4::from([self.group2()[0], self.group1()[0], self.group1()[0], self.group1()[0]]) * other.group0() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -1905,6 +2029,7 @@ impl GeometricProduct<Plane> for MultiVector {
 impl ScalarProduct<Plane> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Plane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group2()[1] * other.group0()[1] + self.group2()[2] * other.group0()[2] + self.group2()[3] * other.group0()[3] } }
     }
@@ -1919,12 +2044,14 @@ impl Into<Line> for MultiVector {
 impl Add<Line> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Line) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + Simd32x4::from([other.group0()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<Line> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Line) {
         *self = (*self).add(other);
     }
@@ -1933,12 +2060,14 @@ impl AddAssign<Line> for MultiVector {
 impl Sub<Line> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Line) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - Simd32x4::from([other.group0()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<Line> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Line) {
         *self = (*self).sub(other);
     }
@@ -1947,6 +2076,7 @@ impl SubAssign<Line> for MultiVector {
 impl GeometricProduct<Line> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group2()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([-1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from([other.group0()[1], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([-1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from([other.group0()[2], other.group0()[1], other.group0()[0], other.group0()[2]]) * Simd32x4::from([-1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group2()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group2()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group0()[1], other.group0()[0], other.group0()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group3()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -1955,6 +2085,7 @@ impl GeometricProduct<Line> for MultiVector {
 impl ScalarProduct<Line> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[1] * other.group1()[0] - self.group0()[2] * other.group1()[1] - self.group0()[3] * other.group1()[2] } }
     }
@@ -1969,12 +2100,14 @@ impl Into<Translator> for MultiVector {
 impl Add<Translator> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Translator) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() + other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<Translator> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Translator) {
         *self = (*self).add(other);
     }
@@ -1983,12 +2116,14 @@ impl AddAssign<Translator> for MultiVector {
 impl Sub<Translator> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Translator) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1(), g2: self.group2(), g3: self.group3() - other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<Translator> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Translator) {
         *self = (*self).sub(other);
     }
@@ -1997,6 +2132,7 @@ impl SubAssign<Translator> for MultiVector {
 impl GeometricProduct<Translator> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() * Simd32x4::from(other.group0()[0]), g1: Simd32x4::from(self.group2()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([-1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([-1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([-1.0, -1.0, 1.0, 0.0]) + self.group1() * Simd32x4::from(other.group0()[0]), g2: self.group2() * Simd32x4::from(other.group0()[0]), g3: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group3()[0], self.group0()[0], self.group0()[0], self.group0()[0]]) * other.group0() } }
     }
@@ -2029,6 +2165,7 @@ impl RightContraction<Translator> for MultiVector {
 impl ScalarProduct<Translator> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -2043,12 +2180,14 @@ impl Into<Motor> for MultiVector {
 impl Add<Motor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + other.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() + other.group1() } }
     }
 }
 
 impl AddAssign<Motor> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: Motor) {
         *self = (*self).add(other);
     }
@@ -2057,12 +2196,14 @@ impl AddAssign<Motor> for MultiVector {
 impl Sub<Motor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - other.group0(), g1: self.group1(), g2: self.group2(), g3: self.group3() - other.group1() } }
     }
 }
 
 impl SubAssign<Motor> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Motor) {
         *self = (*self).sub(other);
     }
@@ -2071,6 +2212,7 @@ impl SubAssign<Motor> for MultiVector {
 impl GeometricProduct<Motor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[0]) * other.group1() + Simd32x4::from(self.group2()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]), g2: Simd32x4::from(self.group2()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group2()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group3()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group3()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -2079,6 +2221,7 @@ impl GeometricProduct<Motor> for MultiVector {
 impl RegressiveProduct<Motor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 1, 1) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group3()[0]) * other.group0() + Simd32x4::from(self.group3()[1]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: Simd32x4::from(self.group1()[1]) * swizzle!(other.group1(), 1, 0, 1, 1) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group1(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group1(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g2: Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group2()[0]) * other.group1() + Simd32x4::from(self.group2()[2]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[0], self.group2()[1], self.group1()[1], self.group1()[1]]) * Simd32x4::from([other.group0()[0], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, -1.0]), g3: Simd32x4::from(self.group3()[0]) * other.group1() + self.group3() * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -2111,6 +2254,7 @@ impl RightContraction<Motor> for MultiVector {
 impl ScalarProduct<Motor> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -2125,12 +2269,14 @@ impl Into<PointAndPlane> for MultiVector {
 impl Add<PointAndPlane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: PointAndPlane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() + Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]), g2: self.group2() + Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]), g3: self.group3() } }
     }
 }
 
 impl AddAssign<PointAndPlane> for MultiVector {
+    #[inline(always)]
     fn add_assign(&mut self, other: PointAndPlane) {
         *self = (*self).add(other);
     }
@@ -2139,12 +2285,14 @@ impl AddAssign<PointAndPlane> for MultiVector {
 impl Sub<PointAndPlane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: PointAndPlane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: self.group1() - Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]), g2: self.group2() - Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]), g3: self.group3() } }
     }
 }
 
 impl SubAssign<PointAndPlane> for MultiVector {
+    #[inline(always)]
     fn sub_assign(&mut self, other: PointAndPlane) {
         *self = (*self).sub(other);
     }
@@ -2153,6 +2301,7 @@ impl SubAssign<PointAndPlane> for MultiVector {
 impl GeometricProduct<PointAndPlane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group2()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group2()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) - Simd32x4::from(self.group3()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group3()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group3()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group3()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) - Simd32x4::from(self.group2()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) + Simd32x4::from(self.group2()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group2()[2]) * Simd32x4::from([other.group0()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group2()[3]) * Simd32x4::from([other.group0()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -2161,6 +2310,7 @@ impl GeometricProduct<PointAndPlane> for MultiVector {
 impl ScalarProduct<PointAndPlane> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: PointAndPlane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group2()[0] * other.group0()[0] + self.group2()[1] * other.group1()[1] + self.group2()[2] * other.group1()[2] + self.group2()[3] * other.group1()[3] } }
     }
@@ -2169,6 +2319,7 @@ impl ScalarProduct<PointAndPlane> for MultiVector {
 impl SquaredMagnitude for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -2177,6 +2328,7 @@ impl SquaredMagnitude for MultiVector {
 impl Magnitude for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -2185,6 +2337,7 @@ impl Magnitude for MultiVector {
 impl Scale for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> MultiVector {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -2201,6 +2354,7 @@ impl Signum for MultiVector {
 impl Inverse for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn inverse(self) -> MultiVector {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -2237,6 +2391,7 @@ impl Automorphism for Rotor {
 impl Reversal for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn reversal(self) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -2259,12 +2414,14 @@ impl Into<Scalar> for Rotor {
 impl Add<Scalar> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() + Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
 }
 
 impl AddAssign<Scalar> for Rotor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Scalar) {
         *self = (*self).add(other);
     }
@@ -2273,12 +2430,14 @@ impl AddAssign<Scalar> for Rotor {
 impl Sub<Scalar> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() - Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
 }
 
 impl SubAssign<Scalar> for Rotor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Scalar) {
         *self = (*self).sub(other);
     }
@@ -2287,6 +2446,7 @@ impl SubAssign<Scalar> for Rotor {
 impl GeometricProduct<Scalar> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() * Simd32x4::from(other.group0()) } }
     }
@@ -2327,6 +2487,7 @@ impl RightContraction<Scalar> for Rotor {
 impl ScalarProduct<Scalar> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0() } }
     }
@@ -2335,6 +2496,7 @@ impl ScalarProduct<Scalar> for Rotor {
 impl Add<MultiVector> for Rotor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + other.group0(), g1: other.group1(), g2: other.group2(), g3: other.group3() } }
     }
@@ -2343,6 +2505,7 @@ impl Add<MultiVector> for Rotor {
 impl Sub<MultiVector> for Rotor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: Simd32x4::from(0.0) - other.group3() } }
     }
@@ -2351,6 +2514,7 @@ impl Sub<MultiVector> for Rotor {
 impl GeometricProduct<MultiVector> for Rotor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group2() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -2383,6 +2547,7 @@ impl LeftContraction<MultiVector> for Rotor {
 impl ScalarProduct<MultiVector> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -2391,12 +2556,14 @@ impl ScalarProduct<MultiVector> for Rotor {
 impl Add<Rotor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn add(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<Rotor> for Rotor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Rotor) {
         *self = (*self).add(other);
     }
@@ -2405,12 +2572,14 @@ impl AddAssign<Rotor> for Rotor {
 impl Sub<Rotor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn sub(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<Rotor> for Rotor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Rotor) {
         *self = (*self).sub(other);
     }
@@ -2447,6 +2616,7 @@ impl DivAssign<Rotor> for Rotor {
 impl GeometricProduct<Rotor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -2487,6 +2657,7 @@ impl RightContraction<Rotor> for Rotor {
 impl ScalarProduct<Rotor> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -2495,6 +2666,7 @@ impl ScalarProduct<Rotor> for Rotor {
 impl GeometricProduct<Point> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + swizzle!(self.group0(), 0, 0, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, 0.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, -1.0]) + swizzle!(self.group0(), 1, 1, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, -1.0, 0.0, 0.0]) } }
     }
@@ -2527,6 +2699,7 @@ impl LeftContraction<Point> for Rotor {
 impl RegressiveProduct<IdealPoint> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: IdealPoint) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group0()[0] + self.group0()[2] * other.group0()[1] + self.group0()[3] * other.group0()[2] } }
     }
@@ -2551,6 +2724,7 @@ impl LeftContraction<IdealPoint> for Rotor {
 impl GeometricProduct<Plane> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, -1.0]) + swizzle!(self.group0(), 1, 1, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, -1.0, 0.0, 0.0]), g1: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + swizzle!(self.group0(), 0, 0, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, 0.0, 1.0, -1.0]) } }
     }
@@ -2583,6 +2757,7 @@ impl LeftContraction<Plane> for Rotor {
 impl GeometricProduct<Line> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group0()[1], other.group0()[0], other.group0()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -2591,6 +2766,7 @@ impl GeometricProduct<Line> for Rotor {
 impl RegressiveProduct<Line> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group0()[0] + self.group0()[2] * other.group0()[1] + self.group0()[3] * other.group0()[2] } }
     }
@@ -2607,6 +2783,7 @@ impl RightContraction<Line> for Rotor {
 impl ScalarProduct<Line> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[1] * other.group1()[0] - self.group0()[2] * other.group1()[1] - self.group0()[3] * other.group1()[2] } }
     }
@@ -2615,6 +2792,7 @@ impl ScalarProduct<Line> for Rotor {
 impl GeometricProduct<Translator> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() * Simd32x4::from(other.group0()[0]), g1: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -2623,6 +2801,7 @@ impl GeometricProduct<Translator> for Rotor {
 impl RegressiveProduct<Translator> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group0()[1] + self.group0()[2] * other.group0()[2] + self.group0()[3] * other.group0()[3] } }
     }
@@ -2655,6 +2834,7 @@ impl RightContraction<Translator> for Rotor {
 impl ScalarProduct<Translator> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -2663,6 +2843,7 @@ impl ScalarProduct<Translator> for Rotor {
 impl Add<Motor> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + other.group0(), g1: other.group1() } }
     }
@@ -2671,6 +2852,7 @@ impl Add<Motor> for Rotor {
 impl Sub<Motor> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - other.group0(), g1: Simd32x4::from(0.0) - other.group1() } }
     }
@@ -2679,6 +2861,7 @@ impl Sub<Motor> for Rotor {
 impl GeometricProduct<Motor> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -2687,6 +2870,7 @@ impl GeometricProduct<Motor> for Rotor {
 impl RegressiveProduct<Motor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 1, 1) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -2727,6 +2911,7 @@ impl RightContraction<Motor> for Rotor {
 impl ScalarProduct<Motor> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -2735,6 +2920,7 @@ impl ScalarProduct<Motor> for Rotor {
 impl GeometricProduct<PointAndPlane> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -2767,6 +2953,7 @@ impl LeftContraction<PointAndPlane> for Rotor {
 impl SquaredMagnitude for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -2775,6 +2962,7 @@ impl SquaredMagnitude for Rotor {
 impl Magnitude for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -2783,6 +2971,7 @@ impl Magnitude for Rotor {
 impl Scale for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Rotor {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -2799,6 +2988,7 @@ impl Signum for Rotor {
 impl Inverse for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn inverse(self) -> Rotor {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -2835,6 +3025,7 @@ impl Automorphism for Point {
 impl Reversal for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn reversal(self) -> Point {
         Point { groups: PointGroups { g0: self.group0() * Simd32x4::from(-1.0) } }
     }
@@ -2859,6 +3050,7 @@ impl Dual for Point {
 impl GeometricProduct<Scalar> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Point {
         Point { groups: PointGroups { g0: self.group0() * Simd32x4::from(other.group0()) } }
     }
@@ -2891,6 +3083,7 @@ impl RightContraction<Scalar> for Point {
 impl Add<MultiVector> for Point {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: other.group0(), g1: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group1(), g2: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group2(), g3: other.group3() } }
     }
@@ -2899,6 +3092,7 @@ impl Add<MultiVector> for Point {
 impl Sub<MultiVector> for Point {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group1(), g2: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group2(), g3: Simd32x4::from(0.0) - other.group3() } }
     }
@@ -2907,6 +3101,7 @@ impl Sub<MultiVector> for Point {
 impl GeometricProduct<MultiVector> for Point {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group2() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g3: Simd32x4::from(0.0) - Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) } }
     }
@@ -2915,6 +3110,7 @@ impl GeometricProduct<MultiVector> for Point {
 impl ScalarProduct<MultiVector> for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group2()[0] } }
     }
@@ -2923,6 +3119,7 @@ impl ScalarProduct<MultiVector> for Point {
 impl GeometricProduct<Rotor> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -2955,12 +3152,14 @@ impl RightContraction<Rotor> for Point {
 impl Add<Point> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn add(self, other: Point) -> Point {
         Point { groups: PointGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<Point> for Point {
+    #[inline(always)]
     fn add_assign(&mut self, other: Point) {
         *self = (*self).add(other);
     }
@@ -2969,12 +3168,14 @@ impl AddAssign<Point> for Point {
 impl Sub<Point> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn sub(self, other: Point) -> Point {
         Point { groups: PointGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<Point> for Point {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Point) {
         *self = (*self).sub(other);
     }
@@ -3011,6 +3212,7 @@ impl DivAssign<Point> for Point {
 impl GeometricProduct<Point> for Point {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(0.0) - Simd32x4::from(self.group0()[0]) * other.group0() + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3019,6 +3221,7 @@ impl GeometricProduct<Point> for Point {
 impl RegressiveProduct<Point> for Point {
     type Output = Line;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> Line {
         Line { groups: LineGroups { g0: Simd32x3::from(self.group0()[2]) * Simd32x3::from([other.group0()[3], other.group0()[3], other.group0()[1]]) * Simd32x3::from([1.0, 0.0, -1.0]) + Simd32x3::from(self.group0()[3]) * Simd32x3::from([other.group0()[2], other.group0()[1], other.group0()[2]]) * Simd32x3::from([-1.0, 1.0, 0.0]) + Simd32x3::from([self.group0()[0], self.group0()[1], self.group0()[1]]) * Simd32x3::from([other.group0()[0], other.group0()[3], other.group0()[2]]) * Simd32x3::from([0.0, -1.0, 1.0]), g1: Simd32x3::from(self.group0()[0]) * Simd32x3::from([other.group0()[1], other.group0()[2], other.group0()[3]]) + Simd32x3::from([self.group0()[1], self.group0()[2], self.group0()[3]]) * Simd32x3::from(other.group0()[0]) * Simd32x3::from(-1.0) } }
     }
@@ -3051,6 +3254,7 @@ impl RightContraction<Point> for Point {
 impl ScalarProduct<Point> for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Point) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] } }
     }
@@ -3059,6 +3263,7 @@ impl ScalarProduct<Point> for Point {
 impl RegressiveProduct<IdealPoint> for Point {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: IdealPoint) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3067,6 +3272,7 @@ impl RegressiveProduct<IdealPoint> for Point {
 impl Add<Plane> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0(), g1: other.group0() } }
     }
@@ -3075,6 +3281,7 @@ impl Add<Plane> for Point {
 impl Sub<Plane> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0(), g1: Simd32x4::from(0.0) - other.group0() } }
     }
@@ -3083,6 +3290,7 @@ impl Sub<Plane> for Point {
 impl RegressiveProduct<Plane> for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Plane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -3107,6 +3315,7 @@ impl RightContraction<Plane> for Point {
 impl RegressiveProduct<Line> for Point {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group1()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group1()[1], other.group1()[0], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3131,6 +3340,7 @@ impl RightContraction<Line> for Point {
 impl GeometricProduct<Translator> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> Point {
         Point { groups: PointGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3139,6 +3349,7 @@ impl GeometricProduct<Translator> for Point {
 impl RegressiveProduct<Translator> for Point {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Translator) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3171,6 +3382,7 @@ impl RightContraction<Translator> for Point {
 impl GeometricProduct<Motor> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, 1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -3179,6 +3391,7 @@ impl GeometricProduct<Motor> for Point {
 impl RegressiveProduct<Motor> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() * Simd32x4::from(other.group1()[0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group1()[1], other.group0()[3], other.group0()[2]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group1()[2], other.group0()[1]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group1()[3]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * other.group1() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -3211,6 +3424,7 @@ impl RightContraction<Motor> for Point {
 impl Add<PointAndPlane> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() + other.group0(), g1: other.group1() } }
     }
@@ -3219,6 +3433,7 @@ impl Add<PointAndPlane> for Point {
 impl Sub<PointAndPlane> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() - other.group0(), g1: Simd32x4::from(0.0) - other.group1() } }
     }
@@ -3227,6 +3442,7 @@ impl Sub<PointAndPlane> for Point {
 impl GeometricProduct<PointAndPlane> for Point {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(0.0) - Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) } }
     }
@@ -3243,6 +3459,7 @@ impl LeftContraction<PointAndPlane> for Point {
 impl ScalarProduct<PointAndPlane> for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: PointAndPlane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] } }
     }
@@ -3251,6 +3468,7 @@ impl ScalarProduct<PointAndPlane> for Point {
 impl SquaredMagnitude for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -3259,6 +3477,7 @@ impl SquaredMagnitude for Point {
 impl Magnitude for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -3267,6 +3486,7 @@ impl Magnitude for Point {
 impl Scale for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Point {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -3283,6 +3503,7 @@ impl Signum for Point {
 impl Inverse for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn inverse(self) -> Point {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -3319,6 +3540,7 @@ impl Automorphism for IdealPoint {
 impl Reversal for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn reversal(self) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() * Simd32x3::from(-1.0) } }
     }
@@ -3335,6 +3557,7 @@ impl Conjugation for IdealPoint {
 impl Add<Scalar> for IdealPoint {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -3343,6 +3566,7 @@ impl Add<Scalar> for IdealPoint {
 impl Sub<Scalar> for IdealPoint {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -3351,6 +3575,7 @@ impl Sub<Scalar> for IdealPoint {
 impl GeometricProduct<Scalar> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() * Simd32x3::from(other.group0()) } }
     }
@@ -3383,6 +3608,7 @@ impl RightContraction<Scalar> for IdealPoint {
 impl Add<MultiVector> for IdealPoint {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: other.group0(), g1: other.group1(), g2: other.group2(), g3: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group3() } }
     }
@@ -3391,6 +3617,7 @@ impl Add<MultiVector> for IdealPoint {
 impl Sub<MultiVector> for IdealPoint {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group3() } }
     }
@@ -3399,6 +3626,7 @@ impl Sub<MultiVector> for IdealPoint {
 impl RegressiveProduct<Rotor> for IdealPoint {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[1] + self.group0()[1] * other.group0()[2] + self.group0()[2] * other.group0()[3] } }
     }
@@ -3423,6 +3651,7 @@ impl RightContraction<Rotor> for IdealPoint {
 impl RegressiveProduct<Point> for IdealPoint {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[0]) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) } }
     }
@@ -3431,12 +3660,14 @@ impl RegressiveProduct<Point> for IdealPoint {
 impl Add<IdealPoint> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<IdealPoint> for IdealPoint {
+    #[inline(always)]
     fn add_assign(&mut self, other: IdealPoint) {
         *self = (*self).add(other);
     }
@@ -3445,12 +3676,14 @@ impl AddAssign<IdealPoint> for IdealPoint {
 impl Sub<IdealPoint> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<IdealPoint> for IdealPoint {
+    #[inline(always)]
     fn sub_assign(&mut self, other: IdealPoint) {
         *self = (*self).sub(other);
     }
@@ -3487,6 +3720,7 @@ impl DivAssign<IdealPoint> for IdealPoint {
 impl Add<Line> for IdealPoint {
     type Output = Line;
 
+    #[inline(always)]
     fn add(self, other: Line) -> Line {
         Line { groups: LineGroups { g0: self.group0() + other.group0(), g1: other.group1() } }
     }
@@ -3495,6 +3729,7 @@ impl Add<Line> for IdealPoint {
 impl Sub<Line> for IdealPoint {
     type Output = Line;
 
+    #[inline(always)]
     fn sub(self, other: Line) -> Line {
         Line { groups: LineGroups { g0: self.group0() - other.group0(), g1: Simd32x3::from(0.0) - other.group1() } }
     }
@@ -3503,6 +3738,7 @@ impl Sub<Line> for IdealPoint {
 impl RegressiveProduct<Line> for IdealPoint {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group1()[0] + self.group0()[1] * other.group1()[1] + self.group0()[2] * other.group1()[2] } }
     }
@@ -3511,6 +3747,7 @@ impl RegressiveProduct<Line> for IdealPoint {
 impl Add<Translator> for IdealPoint {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group0() } }
     }
@@ -3519,6 +3756,7 @@ impl Add<Translator> for IdealPoint {
 impl Sub<Translator> for IdealPoint {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group0() } }
     }
@@ -3527,6 +3765,7 @@ impl Sub<Translator> for IdealPoint {
 impl GeometricProduct<Translator> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: self.group0() * Simd32x3::from(other.group0()[0]) } }
     }
@@ -3559,6 +3798,7 @@ impl RightContraction<Translator> for IdealPoint {
 impl Add<Motor> for IdealPoint {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: other.group0(), g1: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group1() } }
     }
@@ -3567,6 +3807,7 @@ impl Add<Motor> for IdealPoint {
 impl Sub<Motor> for IdealPoint {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group1() } }
     }
@@ -3575,6 +3816,7 @@ impl Sub<Motor> for IdealPoint {
 impl RegressiveProduct<Motor> for IdealPoint {
     type Output = Translator;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[2], other.group0()[2], other.group1()[0], other.group0()[2]]) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[3], other.group0()[3], other.group0()[3], other.group1()[0]]) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[0], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) } }
     }
@@ -3599,6 +3841,7 @@ impl RightContraction<Motor> for IdealPoint {
 impl RegressiveProduct<PointAndPlane> for IdealPoint {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: PointAndPlane) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[0]) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) } }
     }
@@ -3607,6 +3850,7 @@ impl RegressiveProduct<PointAndPlane> for IdealPoint {
 impl Scale for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> IdealPoint {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -3643,6 +3887,7 @@ impl Automorphism for Plane {
 impl Reversal for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn reversal(self) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() } }
     }
@@ -3667,6 +3912,7 @@ impl Dual for Plane {
 impl GeometricProduct<Scalar> for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() * Simd32x4::from(other.group0()) } }
     }
@@ -3699,6 +3945,7 @@ impl RightContraction<Scalar> for Plane {
 impl Add<MultiVector> for Plane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: other.group0(), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group1(), g2: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group2(), g3: other.group3() } }
     }
@@ -3707,6 +3954,7 @@ impl Add<MultiVector> for Plane {
 impl Sub<MultiVector> for Plane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group1(), g2: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group2(), g3: Simd32x4::from(0.0) - other.group3() } }
     }
@@ -3715,6 +3963,7 @@ impl Sub<MultiVector> for Plane {
 impl GeometricProduct<MultiVector> for Plane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]), g2: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group0()[0]) * other.group2() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -3723,6 +3972,7 @@ impl GeometricProduct<MultiVector> for Plane {
 impl ScalarProduct<MultiVector> for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group2()[1] + self.group0()[2] * other.group2()[2] + self.group0()[3] * other.group2()[3] } }
     }
@@ -3731,6 +3981,7 @@ impl ScalarProduct<MultiVector> for Plane {
 impl GeometricProduct<Rotor> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) } }
     }
@@ -3763,6 +4014,7 @@ impl RightContraction<Rotor> for Plane {
 impl Add<Point> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: other.group0(), g1: self.group0() } }
     }
@@ -3771,6 +4023,7 @@ impl Add<Point> for Plane {
 impl Sub<Point> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: self.group0() } }
     }
@@ -3779,6 +4032,7 @@ impl Sub<Point> for Plane {
 impl RegressiveProduct<Point> for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] + self.group0()[1] * other.group0()[1] + self.group0()[2] * other.group0()[2] + self.group0()[3] * other.group0()[3] } }
     }
@@ -3803,12 +4057,14 @@ impl LeftContraction<Point> for Plane {
 impl Add<Plane> for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn add(self, other: Plane) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<Plane> for Plane {
+    #[inline(always)]
     fn add_assign(&mut self, other: Plane) {
         *self = (*self).add(other);
     }
@@ -3817,12 +4073,14 @@ impl AddAssign<Plane> for Plane {
 impl Sub<Plane> for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn sub(self, other: Plane) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<Plane> for Plane {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Plane) {
         *self = (*self).sub(other);
     }
@@ -3891,6 +4149,7 @@ impl RightContraction<Plane> for Plane {
 impl ScalarProduct<Plane> for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Plane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group0()[1] + self.group0()[2] * other.group0()[2] + self.group0()[3] * other.group0()[3] } }
     }
@@ -3899,6 +4158,7 @@ impl ScalarProduct<Plane> for Plane {
 impl GeometricProduct<Line> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[1], other.group0()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[2], other.group0()[1], other.group0()[0], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group1()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group1()[1], other.group1()[0], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + swizzle!(self.group0(), 1, 0, 1, 1) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) } }
     }
@@ -3947,6 +4207,7 @@ impl RightContraction<Translator> for Plane {
 impl GeometricProduct<Motor> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group1()[3], other.group1()[0], other.group1()[1]]) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([0.0, -1.0, -1.0, -1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group0()[0], other.group0()[1]]) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -3955,6 +4216,7 @@ impl GeometricProduct<Motor> for Plane {
 impl RegressiveProduct<Motor> for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Plane {
         Plane { groups: PlaneGroups { g0: self.group0() * Simd32x4::from(other.group1()[0]) } }
     }
@@ -3979,6 +4241,7 @@ impl RightContraction<Motor> for Plane {
 impl Add<PointAndPlane> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: other.group0(), g1: self.group0() + other.group1() } }
     }
@@ -3987,6 +4250,7 @@ impl Add<PointAndPlane> for Plane {
 impl Sub<PointAndPlane> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: self.group0() - other.group1() } }
     }
@@ -3995,6 +4259,7 @@ impl Sub<PointAndPlane> for Plane {
 impl GeometricProduct<PointAndPlane> for Plane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -4003,6 +4268,7 @@ impl GeometricProduct<PointAndPlane> for Plane {
 impl RegressiveProduct<PointAndPlane> for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: PointAndPlane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] + self.group0()[1] * other.group0()[1] + self.group0()[2] * other.group0()[2] + self.group0()[3] * other.group0()[3] } }
     }
@@ -4019,6 +4285,7 @@ impl RightContraction<PointAndPlane> for Plane {
 impl ScalarProduct<PointAndPlane> for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: PointAndPlane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group1()[1] + self.group0()[2] * other.group1()[2] + self.group0()[3] * other.group1()[3] } }
     }
@@ -4027,6 +4294,7 @@ impl ScalarProduct<PointAndPlane> for Plane {
 impl SquaredMagnitude for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -4035,6 +4303,7 @@ impl SquaredMagnitude for Plane {
 impl Magnitude for Plane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -4043,6 +4312,7 @@ impl Magnitude for Plane {
 impl Scale for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Plane {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -4059,6 +4329,7 @@ impl Signum for Plane {
 impl Inverse for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn inverse(self) -> Plane {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -4095,6 +4366,7 @@ impl Automorphism for Line {
 impl Reversal for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn reversal(self) -> Line {
         Line { groups: LineGroups { g0: self.group0() * Simd32x3::from(-1.0), g1: self.group1() * Simd32x3::from(-1.0) } }
     }
@@ -4119,6 +4391,7 @@ impl Dual for Line {
 impl GeometricProduct<Scalar> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Line {
         Line { groups: LineGroups { g0: self.group0() * Simd32x3::from(other.group0()), g1: self.group1() * Simd32x3::from(other.group0()) } }
     }
@@ -4151,6 +4424,7 @@ impl RightContraction<Scalar> for Line {
 impl Add<MultiVector> for Line {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[0], self.group1()[1], self.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group0(), g1: other.group1(), g2: other.group2(), g3: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group3() } }
     }
@@ -4159,6 +4433,7 @@ impl Add<MultiVector> for Line {
 impl Sub<MultiVector> for Line {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[0], self.group1()[1], self.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group3() } }
     }
@@ -4167,6 +4442,7 @@ impl Sub<MultiVector> for Line {
 impl GeometricProduct<MultiVector> for Line {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group1()[0]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group0()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -4175,6 +4451,7 @@ impl GeometricProduct<MultiVector> for Line {
 impl ScalarProduct<MultiVector> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group1()[0] * other.group0()[1] - self.group1()[1] * other.group0()[2] - self.group1()[2] * other.group0()[3] } }
     }
@@ -4183,6 +4460,7 @@ impl ScalarProduct<MultiVector> for Line {
 impl GeometricProduct<Rotor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -4191,6 +4469,7 @@ impl GeometricProduct<Rotor> for Line {
 impl RegressiveProduct<Rotor> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[1] + self.group0()[1] * other.group0()[2] + self.group0()[2] * other.group0()[3] } }
     }
@@ -4207,6 +4486,7 @@ impl LeftContraction<Rotor> for Line {
 impl ScalarProduct<Rotor> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group1()[0] * other.group0()[1] - self.group1()[1] * other.group0()[2] - self.group1()[2] * other.group0()[3] } }
     }
@@ -4215,6 +4495,7 @@ impl ScalarProduct<Rotor> for Line {
 impl RegressiveProduct<Point> for Line {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from([self.group0()[0], self.group0()[0], self.group1()[0], self.group1()[0]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -4245,12 +4526,14 @@ impl Into<IdealPoint> for Line {
 impl Add<IdealPoint> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> Line {
         Line { groups: LineGroups { g0: self.group0() + other.group0(), g1: self.group1() } }
     }
 }
 
 impl AddAssign<IdealPoint> for Line {
+    #[inline(always)]
     fn add_assign(&mut self, other: IdealPoint) {
         *self = (*self).add(other);
     }
@@ -4259,12 +4542,14 @@ impl AddAssign<IdealPoint> for Line {
 impl Sub<IdealPoint> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> Line {
         Line { groups: LineGroups { g0: self.group0() - other.group0(), g1: self.group1() } }
     }
 }
 
 impl SubAssign<IdealPoint> for Line {
+    #[inline(always)]
     fn sub_assign(&mut self, other: IdealPoint) {
         *self = (*self).sub(other);
     }
@@ -4273,6 +4558,7 @@ impl SubAssign<IdealPoint> for Line {
 impl RegressiveProduct<IdealPoint> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: IdealPoint) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group1()[0] * other.group0()[0] + self.group1()[1] * other.group0()[1] + self.group1()[2] * other.group0()[2] } }
     }
@@ -4281,6 +4567,7 @@ impl RegressiveProduct<IdealPoint> for Line {
 impl GeometricProduct<Plane> for Line {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, -1.0]) + Simd32x4::from([self.group1()[0], self.group1()[0], self.group0()[0], self.group0()[0]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from([self.group0()[0], self.group0()[0], self.group1()[0], self.group1()[0]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) } }
     }
@@ -4313,12 +4600,14 @@ impl RightContraction<Plane> for Line {
 impl Add<Line> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn add(self, other: Line) -> Line {
         Line { groups: LineGroups { g0: self.group0() + other.group0(), g1: self.group1() + other.group1() } }
     }
 }
 
 impl AddAssign<Line> for Line {
+    #[inline(always)]
     fn add_assign(&mut self, other: Line) {
         *self = (*self).add(other);
     }
@@ -4327,12 +4616,14 @@ impl AddAssign<Line> for Line {
 impl Sub<Line> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn sub(self, other: Line) -> Line {
         Line { groups: LineGroups { g0: self.group0() - other.group0(), g1: self.group1() - other.group1() } }
     }
 }
 
 impl SubAssign<Line> for Line {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Line) {
         *self = (*self).sub(other);
     }
@@ -4369,6 +4660,7 @@ impl DivAssign<Line> for Line {
 impl GeometricProduct<Line> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[1], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group0()[2], other.group0()[1], other.group0()[0], other.group0()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) } }
     }
@@ -4377,6 +4669,7 @@ impl GeometricProduct<Line> for Line {
 impl RegressiveProduct<Line> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group1()[0] + self.group0()[1] * other.group1()[1] + self.group0()[2] * other.group1()[2] + self.group1()[0] * other.group0()[0] + self.group1()[1] * other.group0()[1] + self.group1()[2] * other.group0()[2] } }
     }
@@ -4409,6 +4702,7 @@ impl RightContraction<Line> for Line {
 impl ScalarProduct<Line> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group1()[0] * other.group1()[0] - self.group1()[1] * other.group1()[1] - self.group1()[2] * other.group1()[2] } }
     }
@@ -4417,6 +4711,7 @@ impl ScalarProduct<Line> for Line {
 impl RegressiveProduct<Translator> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group1()[0] * other.group0()[1] + self.group1()[1] * other.group0()[2] + self.group1()[2] * other.group0()[3] } }
     }
@@ -4441,6 +4736,7 @@ impl RightContraction<Translator> for Line {
 impl Add<Motor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[0], self.group1()[1], self.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group0(), g1: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group1() } }
     }
@@ -4449,6 +4745,7 @@ impl Add<Motor> for Line {
 impl Sub<Motor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[0], self.group1()[1], self.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group0(), g1: Simd32x4::from([self.group0()[0], self.group0()[0], self.group0()[1], self.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group1() } }
     }
@@ -4457,6 +4754,7 @@ impl Sub<Motor> for Line {
 impl GeometricProduct<Motor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -4473,6 +4771,7 @@ impl LeftContraction<Motor> for Line {
 impl ScalarProduct<Motor> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group1()[0] * other.group0()[1] - self.group1()[1] * other.group0()[2] - self.group1()[2] * other.group0()[3] } }
     }
@@ -4481,6 +4780,7 @@ impl ScalarProduct<Motor> for Line {
 impl GeometricProduct<PointAndPlane> for Line {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[3], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([0.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([0.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group1()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group0()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group0()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group0()[0]) * swizzle!(other.group1(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -4489,6 +4789,7 @@ impl GeometricProduct<PointAndPlane> for Line {
 impl RegressiveProduct<PointAndPlane> for Line {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: PointAndPlane) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from([self.group0()[0], self.group0()[0], self.group1()[0], self.group1()[0]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -4529,6 +4830,7 @@ impl RightContraction<PointAndPlane> for Line {
 impl SquaredMagnitude for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -4537,6 +4839,7 @@ impl SquaredMagnitude for Line {
 impl Magnitude for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -4545,6 +4848,7 @@ impl Magnitude for Line {
 impl Scale for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Line {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -4561,6 +4865,7 @@ impl Signum for Line {
 impl Inverse for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn inverse(self) -> Line {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -4597,6 +4902,7 @@ impl Automorphism for Translator {
 impl Reversal for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn reversal(self) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -4619,12 +4925,14 @@ impl Into<Scalar> for Translator {
 impl Add<Scalar> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() + Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
 }
 
 impl AddAssign<Scalar> for Translator {
+    #[inline(always)]
     fn add_assign(&mut self, other: Scalar) {
         *self = (*self).add(other);
     }
@@ -4633,12 +4941,14 @@ impl AddAssign<Scalar> for Translator {
 impl Sub<Scalar> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() - Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
 }
 
 impl SubAssign<Scalar> for Translator {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Scalar) {
         *self = (*self).sub(other);
     }
@@ -4647,6 +4957,7 @@ impl SubAssign<Scalar> for Translator {
 impl GeometricProduct<Scalar> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() * Simd32x4::from(other.group0()) } }
     }
@@ -4687,6 +4998,7 @@ impl RightContraction<Scalar> for Translator {
 impl ScalarProduct<Scalar> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0() } }
     }
@@ -4695,6 +5007,7 @@ impl ScalarProduct<Scalar> for Translator {
 impl Add<MultiVector> for Translator {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0(), g1: other.group1(), g2: other.group2(), g3: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group3() } }
     }
@@ -4703,6 +5016,7 @@ impl Add<MultiVector> for Translator {
 impl Sub<MultiVector> for Translator {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group3() } }
     }
@@ -4711,6 +5025,7 @@ impl Sub<MultiVector> for Translator {
 impl GeometricProduct<MultiVector> for Translator {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0(), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group2(), g3: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -4743,6 +5058,7 @@ impl LeftContraction<MultiVector> for Translator {
 impl ScalarProduct<MultiVector> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -4751,6 +5067,7 @@ impl ScalarProduct<MultiVector> for Translator {
 impl GeometricProduct<Rotor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0(), g1: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -4759,6 +5076,7 @@ impl GeometricProduct<Rotor> for Translator {
 impl RegressiveProduct<Rotor> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group0()[1] + self.group0()[2] * other.group0()[2] + self.group0()[3] * other.group0()[3] } }
     }
@@ -4791,6 +5109,7 @@ impl RightContraction<Rotor> for Translator {
 impl ScalarProduct<Rotor> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -4799,6 +5118,7 @@ impl ScalarProduct<Rotor> for Translator {
 impl GeometricProduct<Point> for Translator {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> Point {
         Point { groups: PointGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) } }
     }
@@ -4807,6 +5127,7 @@ impl GeometricProduct<Point> for Translator {
 impl RegressiveProduct<Point> for Translator {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + swizzle!(self.group0(), 1, 1, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) } }
     }
@@ -4845,12 +5166,14 @@ impl Into<IdealPoint> for Translator {
 impl Add<IdealPoint> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<IdealPoint> for Translator {
+    #[inline(always)]
     fn add_assign(&mut self, other: IdealPoint) {
         *self = (*self).add(other);
     }
@@ -4859,12 +5182,14 @@ impl AddAssign<IdealPoint> for Translator {
 impl Sub<IdealPoint> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<IdealPoint> for Translator {
+    #[inline(always)]
     fn sub_assign(&mut self, other: IdealPoint) {
         *self = (*self).sub(other);
     }
@@ -4873,6 +5198,7 @@ impl SubAssign<IdealPoint> for Translator {
 impl GeometricProduct<IdealPoint> for Translator {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_product(self, other: IdealPoint) -> IdealPoint {
         IdealPoint { groups: IdealPointGroups { g0: Simd32x3::from(self.group0()[0]) * other.group0() } }
     }
@@ -4921,6 +5247,7 @@ impl LeftContraction<Plane> for Translator {
 impl RegressiveProduct<Line> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[1] * other.group1()[0] + self.group0()[2] * other.group1()[1] + self.group0()[3] * other.group1()[2] } }
     }
@@ -4945,12 +5272,14 @@ impl LeftContraction<Line> for Translator {
 impl Add<Translator> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn add(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() + other.group0() } }
     }
 }
 
 impl AddAssign<Translator> for Translator {
+    #[inline(always)]
     fn add_assign(&mut self, other: Translator) {
         *self = (*self).add(other);
     }
@@ -4959,12 +5288,14 @@ impl AddAssign<Translator> for Translator {
 impl Sub<Translator> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn sub(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: self.group0() - other.group0() } }
     }
 }
 
 impl SubAssign<Translator> for Translator {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Translator) {
         *self = (*self).sub(other);
     }
@@ -5001,6 +5332,7 @@ impl DivAssign<Translator> for Translator {
 impl GeometricProduct<Translator> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -5041,6 +5373,7 @@ impl RightContraction<Translator> for Translator {
 impl ScalarProduct<Translator> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -5049,6 +5382,7 @@ impl ScalarProduct<Translator> for Translator {
 impl Add<Motor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + other.group0(), g1: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) + other.group1() } }
     }
@@ -5057,6 +5391,7 @@ impl Add<Motor> for Translator {
 impl Sub<Motor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) - other.group0(), g1: self.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) - other.group1() } }
     }
@@ -5065,6 +5400,7 @@ impl Sub<Motor> for Translator {
 impl GeometricProduct<Motor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0(), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5073,6 +5409,7 @@ impl GeometricProduct<Motor> for Translator {
 impl RegressiveProduct<Motor> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[1], other.group0()[1]]) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group0()[2], other.group1()[0], other.group0()[2]]) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group0()[3], other.group0()[3], other.group1()[0]]) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -5113,6 +5450,7 @@ impl RightContraction<Motor> for Translator {
 impl ScalarProduct<Motor> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -5121,6 +5459,7 @@ impl ScalarProduct<Motor> for Translator {
 impl GeometricProduct<PointAndPlane> for Translator {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[3], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([0.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[2], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([0.0, 1.0, -1.0, -1.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group1(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -5129,6 +5468,7 @@ impl GeometricProduct<PointAndPlane> for Translator {
 impl RegressiveProduct<PointAndPlane> for Translator {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: PointAndPlane) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + swizzle!(self.group0(), 1, 1, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) } }
     }
@@ -5161,6 +5501,7 @@ impl LeftContraction<PointAndPlane> for Translator {
 impl SquaredMagnitude for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -5169,6 +5510,7 @@ impl SquaredMagnitude for Translator {
 impl Magnitude for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -5177,6 +5519,7 @@ impl Magnitude for Translator {
 impl Scale for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Translator {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -5193,6 +5536,7 @@ impl Signum for Translator {
 impl Inverse for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn inverse(self) -> Translator {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -5229,6 +5573,7 @@ impl Automorphism for Motor {
 impl Reversal for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn reversal(self) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]), g1: self.group1() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -5259,12 +5604,14 @@ impl Into<Scalar> for Motor {
 impl Add<Scalar> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Scalar) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1() } }
     }
 }
 
 impl AddAssign<Scalar> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Scalar) {
         *self = (*self).add(other);
     }
@@ -5273,12 +5620,14 @@ impl AddAssign<Scalar> for Motor {
 impl Sub<Scalar> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Scalar) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - Simd32x4::from(other.group0()) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1() } }
     }
 }
 
 impl SubAssign<Scalar> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Scalar) {
         *self = (*self).sub(other);
     }
@@ -5287,6 +5636,7 @@ impl SubAssign<Scalar> for Motor {
 impl GeometricProduct<Scalar> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() * Simd32x4::from(other.group0()), g1: self.group1() * Simd32x4::from(other.group0()) } }
     }
@@ -5295,6 +5645,7 @@ impl GeometricProduct<Scalar> for Motor {
 impl RegressiveProduct<Scalar> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group1()[0] * other.group0() } }
     }
@@ -5335,6 +5686,7 @@ impl RightContraction<Scalar> for Motor {
 impl ScalarProduct<Scalar> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Scalar) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0() } }
     }
@@ -5343,6 +5695,7 @@ impl ScalarProduct<Scalar> for Motor {
 impl Add<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() + other.group0(), g1: other.group1(), g2: other.group2(), g3: self.group1() + other.group3() } }
     }
@@ -5351,6 +5704,7 @@ impl Add<MultiVector> for Motor {
 impl Sub<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0() - other.group0(), g1: Simd32x4::from(0.0) - other.group1(), g2: Simd32x4::from(0.0) - other.group2(), g3: self.group1() - other.group3() } }
     }
@@ -5359,6 +5713,7 @@ impl Sub<MultiVector> for Motor {
 impl GeometricProduct<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) - Simd32x4::from(self.group1()[0]) * other.group2() + Simd32x4::from(self.group1()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group2() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]), g3: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5367,6 +5722,7 @@ impl GeometricProduct<MultiVector> for Motor {
 impl RegressiveProduct<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn regressive_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group3(), 1, 0, 1, 1) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group3(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group3(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group3()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: Simd32x4::from(self.group1()[0]) * other.group1() + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group1(), 1, 0, 0, 0) * swizzle!(other.group1(), 1, 0, 0, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]), g2: Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * other.group2() + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group2()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group0()[0], self.group1()[1], self.group0()[1], self.group0()[1]]) * Simd32x4::from([other.group1()[0], other.group2()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(self.group1()[0]) * other.group3() + self.group1() * Simd32x4::from(other.group3()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -5399,6 +5755,7 @@ impl LeftContraction<MultiVector> for Motor {
 impl ScalarProduct<MultiVector> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -5413,12 +5770,14 @@ impl Into<Rotor> for Motor {
 impl Add<Rotor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Rotor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + other.group0(), g1: self.group1() } }
     }
 }
 
 impl AddAssign<Rotor> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Rotor) {
         *self = (*self).add(other);
     }
@@ -5427,12 +5786,14 @@ impl AddAssign<Rotor> for Motor {
 impl Sub<Rotor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Rotor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - other.group0(), g1: self.group1() } }
     }
 }
 
 impl SubAssign<Rotor> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Rotor) {
         *self = (*self).sub(other);
     }
@@ -5441,6 +5802,7 @@ impl SubAssign<Rotor> for Motor {
 impl GeometricProduct<Rotor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5449,6 +5811,7 @@ impl GeometricProduct<Rotor> for Motor {
 impl RegressiveProduct<Rotor> for Motor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn regressive_product(self, other: Rotor) -> Rotor {
         Rotor { groups: RotorGroups { g0: Simd32x4::from(self.group1()[0]) * other.group0() + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group1(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -5489,6 +5852,7 @@ impl RightContraction<Rotor> for Motor {
 impl ScalarProduct<Rotor> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Rotor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -5497,6 +5861,7 @@ impl ScalarProduct<Rotor> for Motor {
 impl GeometricProduct<Point> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, -1.0]) + Simd32x4::from([self.group0()[0], self.group1()[1], self.group0()[1], self.group0()[1]]) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, -1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 1, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, -1.0, 0.0, 0.0]) } }
     }
@@ -5505,6 +5870,7 @@ impl GeometricProduct<Point> for Motor {
 impl RegressiveProduct<Point> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group1()[0]) * other.group0(), g1: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[1], self.group1()[1], self.group0()[1], self.group0()[1]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5543,12 +5909,14 @@ impl Into<IdealPoint> for Motor {
 impl Add<IdealPoint> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: IdealPoint) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0(), g1: self.group1() + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<IdealPoint> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: IdealPoint) {
         *self = (*self).add(other);
     }
@@ -5557,12 +5925,14 @@ impl AddAssign<IdealPoint> for Motor {
 impl Sub<IdealPoint> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: IdealPoint) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0(), g1: self.group1() - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<IdealPoint> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: IdealPoint) {
         *self = (*self).sub(other);
     }
@@ -5571,6 +5941,7 @@ impl SubAssign<IdealPoint> for Motor {
 impl RegressiveProduct<IdealPoint> for Motor {
     type Output = Translator;
 
+    #[inline(always)]
     fn regressive_product(self, other: IdealPoint) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from([self.group0()[1], self.group1()[0], self.group1()[0], self.group1()[0]]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) } }
     }
@@ -5595,6 +5966,7 @@ impl LeftContraction<IdealPoint> for Motor {
 impl GeometricProduct<Plane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from([self.group0()[1], self.group0()[1], self.group1()[1], self.group1()[1]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from([self.group1()[1], self.group0()[0], self.group0()[1], self.group0()[1]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) } }
     }
@@ -5603,6 +5975,7 @@ impl GeometricProduct<Plane> for Motor {
 impl RegressiveProduct<Plane> for Motor {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Plane) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group1()[0]) * other.group0() } }
     }
@@ -5633,12 +6006,14 @@ impl Into<Line> for Motor {
 impl Add<Line> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Line) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + Simd32x4::from([other.group0()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: self.group1() + Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<Line> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Line) {
         *self = (*self).add(other);
     }
@@ -5647,12 +6022,14 @@ impl AddAssign<Line> for Motor {
 impl Sub<Line> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Line) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - Simd32x4::from([other.group0()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: self.group1() - Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<Line> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Line) {
         *self = (*self).sub(other);
     }
@@ -5661,6 +6038,7 @@ impl SubAssign<Line> for Motor {
 impl GeometricProduct<Line> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group0()[1], other.group0()[0], other.group0()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[1], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[2], other.group1()[1], other.group1()[0], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -5677,6 +6055,7 @@ impl RightContraction<Line> for Motor {
 impl ScalarProduct<Line> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Line) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[1] * other.group1()[0] - self.group0()[2] * other.group1()[1] - self.group0()[3] * other.group1()[2] } }
     }
@@ -5691,12 +6070,14 @@ impl Into<Translator> for Motor {
 impl Add<Translator> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Translator) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1() + other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl AddAssign<Translator> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Translator) {
         *self = (*self).add(other);
     }
@@ -5705,12 +6086,14 @@ impl AddAssign<Translator> for Motor {
 impl Sub<Translator> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Translator) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: self.group1() - other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
 }
 
 impl SubAssign<Translator> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Translator) {
         *self = (*self).sub(other);
     }
@@ -5719,6 +6102,7 @@ impl SubAssign<Translator> for Motor {
 impl GeometricProduct<Translator> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() * Simd32x4::from(other.group0()[0]), g1: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[0], self.group0()[0], self.group0()[0], self.group0()[0]]) * other.group0() } }
     }
@@ -5727,6 +6111,7 @@ impl GeometricProduct<Translator> for Motor {
 impl RegressiveProduct<Translator> for Motor {
     type Output = Translator;
 
+    #[inline(always)]
     fn regressive_product(self, other: Translator) -> Translator {
         Translator { groups: TranslatorGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * other.group0() + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -5767,6 +6152,7 @@ impl RightContraction<Translator> for Motor {
 impl ScalarProduct<Translator> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Translator) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] } }
     }
@@ -5775,12 +6161,14 @@ impl ScalarProduct<Translator> for Motor {
 impl Add<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() + other.group0(), g1: self.group1() + other.group1() } }
     }
 }
 
 impl AddAssign<Motor> for Motor {
+    #[inline(always)]
     fn add_assign(&mut self, other: Motor) {
         *self = (*self).add(other);
     }
@@ -5789,12 +6177,14 @@ impl AddAssign<Motor> for Motor {
 impl Sub<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: self.group0() - other.group0(), g1: self.group1() - other.group1() } }
     }
 }
 
 impl SubAssign<Motor> for Motor {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Motor) {
         *self = (*self).sub(other);
     }
@@ -5831,6 +6221,7 @@ impl DivAssign<Motor> for Motor {
 impl GeometricProduct<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5839,6 +6230,7 @@ impl GeometricProduct<Motor> for Motor {
 impl RegressiveProduct<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[1]) * swizzle!(other.group1(), 1, 0, 1, 1) * Simd32x4::from([1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group1(), 2, 2, 0, 2) * Simd32x4::from([1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group1(), 3, 3, 3, 0) * Simd32x4::from([1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]), g1: Simd32x4::from(self.group1()[0]) * other.group1() + self.group1() * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -5879,6 +6271,7 @@ impl RightContraction<Motor> for Motor {
 impl ScalarProduct<Motor> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Motor) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -5887,6 +6280,7 @@ impl ScalarProduct<Motor> for Motor {
 impl Add<PointAndPlane> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: PointAndPlane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]), g2: Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]), g3: self.group1() } }
     }
@@ -5895,6 +6289,7 @@ impl Add<PointAndPlane> for Motor {
 impl Sub<PointAndPlane> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: PointAndPlane) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: self.group0(), g1: Simd32x4::from(0.0) - Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]), g2: Simd32x4::from(0.0) - Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]), g3: self.group1() } }
     }
@@ -5903,6 +6298,7 @@ impl Sub<PointAndPlane> for Motor {
 impl GeometricProduct<PointAndPlane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[3], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([0.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[2], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([0.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[0]) * other.group1() * Simd32x4::from([0.0, -1.0, -1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group1()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group1()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -5911,6 +6307,7 @@ impl GeometricProduct<PointAndPlane> for Motor {
 impl RegressiveProduct<PointAndPlane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn regressive_product(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group1()[0]) * other.group0(), g1: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * other.group1() + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[1], self.group1()[1], self.group0()[1], self.group0()[1]]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) } }
     }
@@ -5943,6 +6340,7 @@ impl LeftContraction<PointAndPlane> for Motor {
 impl SquaredMagnitude for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -5951,6 +6349,7 @@ impl SquaredMagnitude for Motor {
 impl Magnitude for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -5959,6 +6358,7 @@ impl Magnitude for Motor {
 impl Scale for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> Motor {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -5975,6 +6375,7 @@ impl Signum for Motor {
 impl Inverse for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn inverse(self) -> Motor {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -6011,6 +6412,7 @@ impl Automorphism for PointAndPlane {
 impl Reversal for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn reversal(self) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() * Simd32x4::from(-1.0), g1: self.group1() } }
     }
@@ -6035,6 +6437,7 @@ impl Dual for PointAndPlane {
 impl GeometricProduct<Scalar> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Scalar) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() * Simd32x4::from(other.group0()), g1: self.group1() * Simd32x4::from(other.group0()) } }
     }
@@ -6067,6 +6470,7 @@ impl RightContraction<Scalar> for PointAndPlane {
 impl Add<MultiVector> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: other.group0(), g1: Simd32x4::from([self.group1()[0], self.group0()[1], self.group0()[2], self.group0()[3]]) + other.group1(), g2: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]) + other.group2(), g3: other.group3() } }
     }
@@ -6075,6 +6479,7 @@ impl Add<MultiVector> for PointAndPlane {
 impl Sub<MultiVector> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: Simd32x4::from([self.group1()[0], self.group0()[1], self.group0()[2], self.group0()[3]]) - other.group1(), g2: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]) - other.group2(), g3: Simd32x4::from(0.0) - other.group3() } }
     }
@@ -6083,6 +6488,7 @@ impl Sub<MultiVector> for PointAndPlane {
 impl GeometricProduct<MultiVector> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_product(self, other: MultiVector) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(self.group0()[0]) * other.group2() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[0]) * other.group3() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group3(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group3(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group3(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]), g2: Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]), g3: Simd32x4::from(0.0) - Simd32x4::from(self.group0()[0]) * other.group1() + Simd32x4::from(self.group0()[1]) * swizzle!(other.group2(), 1, 0, 3, 2) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group2(), 2, 3, 0, 1) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group2(), 3, 2, 1, 0) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * other.group2() + Simd32x4::from(self.group1()[1]) * swizzle!(other.group1(), 1, 0, 3, 2) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group1(), 2, 3, 0, 1) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group1(), 3, 2, 1, 0) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -6091,6 +6497,7 @@ impl GeometricProduct<MultiVector> for PointAndPlane {
 impl ScalarProduct<MultiVector> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: MultiVector) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group2()[0] + self.group1()[1] * other.group2()[1] + self.group1()[2] * other.group2()[2] + self.group1()[3] * other.group2()[3] } }
     }
@@ -6099,6 +6506,7 @@ impl ScalarProduct<MultiVector> for PointAndPlane {
 impl GeometricProduct<Rotor> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Rotor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -6137,12 +6545,14 @@ impl Into<Point> for PointAndPlane {
 impl Add<Point> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() + other.group0(), g1: self.group1() } }
     }
 }
 
 impl AddAssign<Point> for PointAndPlane {
+    #[inline(always)]
     fn add_assign(&mut self, other: Point) {
         *self = (*self).add(other);
     }
@@ -6151,12 +6561,14 @@ impl AddAssign<Point> for PointAndPlane {
 impl Sub<Point> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: Point) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() - other.group0(), g1: self.group1() } }
     }
 }
 
 impl SubAssign<Point> for PointAndPlane {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Point) {
         *self = (*self).sub(other);
     }
@@ -6165,6 +6577,7 @@ impl SubAssign<Point> for PointAndPlane {
 impl GeometricProduct<Point> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Point) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, 1.0, -1.0, 0.0]) + Simd32x4::from([self.group1()[0], self.group0()[0], self.group0()[0], self.group0()[0]]) * other.group0() * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -6181,6 +6594,7 @@ impl RightContraction<Point> for PointAndPlane {
 impl ScalarProduct<Point> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Point) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] } }
     }
@@ -6189,6 +6603,7 @@ impl ScalarProduct<Point> for PointAndPlane {
 impl RegressiveProduct<IdealPoint> for PointAndPlane {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: IdealPoint) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[1]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -6203,12 +6618,14 @@ impl Into<Plane> for PointAndPlane {
 impl Add<Plane> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0(), g1: self.group1() + other.group0() } }
     }
 }
 
 impl AddAssign<Plane> for PointAndPlane {
+    #[inline(always)]
     fn add_assign(&mut self, other: Plane) {
         *self = (*self).add(other);
     }
@@ -6217,12 +6634,14 @@ impl AddAssign<Plane> for PointAndPlane {
 impl Sub<Plane> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: Plane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0(), g1: self.group1() - other.group0() } }
     }
 }
 
 impl SubAssign<Plane> for PointAndPlane {
+    #[inline(always)]
     fn sub_assign(&mut self, other: Plane) {
         *self = (*self).sub(other);
     }
@@ -6231,6 +6650,7 @@ impl SubAssign<Plane> for PointAndPlane {
 impl GeometricProduct<Plane> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: Plane) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * other.group0() * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[1]) * swizzle!(other.group0(), 1, 1, 3, 2) * Simd32x4::from([-1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 2, 3, 2, 1) * Simd32x4::from([-1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 3, 2, 1, 3) * Simd32x4::from([-1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, -1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 0.0, 0.0, -1.0]) + Simd32x4::from([self.group0()[0], self.group1()[0], self.group1()[0], self.group1()[0]]) * other.group0() * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -6239,6 +6659,7 @@ impl GeometricProduct<Plane> for PointAndPlane {
 impl RegressiveProduct<Plane> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn regressive_product(self, other: Plane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] - self.group0()[1] * other.group0()[1] - self.group0()[2] * other.group0()[2] - self.group0()[3] * other.group0()[3] } }
     }
@@ -6255,6 +6676,7 @@ impl LeftContraction<Plane> for PointAndPlane {
 impl ScalarProduct<Plane> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: Plane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.group1()[1] * other.group0()[1] + self.group1()[2] * other.group0()[2] + self.group1()[3] * other.group0()[3] } }
     }
@@ -6263,6 +6685,7 @@ impl ScalarProduct<Plane> for PointAndPlane {
 impl GeometricProduct<Line> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Line) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[2], other.group1()[2], other.group1()[2], other.group1()[1]]) * Simd32x4::from([0.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[2], other.group1()[2], other.group1()[0]]) * Simd32x4::from([0.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[1], other.group1()[1], other.group1()[0], other.group1()[1]]) * Simd32x4::from([0.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group0()[2], other.group0()[1]]) * Simd32x4::from([1.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[1], other.group0()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[2], other.group0()[1], other.group0()[0], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group1()[1]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group1()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group0()[1], other.group1()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group0()[2], other.group1()[1], other.group1()[0], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * Simd32x4::from([other.group1()[0], other.group1()[0], other.group1()[1], other.group1()[2]]) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) } }
     }
@@ -6271,6 +6694,7 @@ impl GeometricProduct<Line> for PointAndPlane {
 impl RegressiveProduct<Line> for PointAndPlane {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Line) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group1()[2], other.group1()[1]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group0()[1], other.group1()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group0()[2], other.group1()[1], other.group1()[0], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group0()[0], other.group0()[1], other.group0()[2]]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]) } }
     }
@@ -6311,6 +6735,7 @@ impl RightContraction<Line> for PointAndPlane {
 impl GeometricProduct<Translator> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Translator) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * other.group0() + Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 3, 3, 3, 2) * Simd32x4::from([0.0, 0.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 3, 3, 3, 1) * Simd32x4::from([0.0, 1.0, 0.0, -1.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 2, 2, 1, 2) * Simd32x4::from([0.0, -1.0, 1.0, 0.0]) + self.group0() * Simd32x4::from(other.group0()[0]) * Simd32x4::from([0.0, 1.0, 1.0, 1.0]), g1: Simd32x4::from(self.group1()[1]) * swizzle!(other.group0(), 1, 0, 1, 1) * Simd32x4::from([-1.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * swizzle!(other.group0(), 2, 2, 0, 2) * Simd32x4::from([-1.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * swizzle!(other.group0(), 3, 3, 3, 0) * Simd32x4::from([-1.0, 0.0, 0.0, 1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -6319,6 +6744,7 @@ impl GeometricProduct<Translator> for PointAndPlane {
 impl RegressiveProduct<Translator> for PointAndPlane {
     type Output = Plane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Translator) -> Plane {
         Plane { groups: PlaneGroups { g0: Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([-1.0, 0.0, 0.0, 0.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) } }
     }
@@ -6351,6 +6777,7 @@ impl RightContraction<Translator> for PointAndPlane {
 impl Add<Motor> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn add(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: other.group0(), g1: Simd32x4::from([self.group1()[0], self.group0()[1], self.group0()[2], self.group0()[3]]), g2: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]), g3: other.group1() } }
     }
@@ -6359,6 +6786,7 @@ impl Add<Motor> for PointAndPlane {
 impl Sub<Motor> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn sub(self, other: Motor) -> MultiVector {
         MultiVector { groups: MultiVectorGroups { g0: Simd32x4::from(0.0) - other.group0(), g1: Simd32x4::from([self.group1()[0], self.group0()[1], self.group0()[2], self.group0()[3]]), g2: Simd32x4::from([self.group0()[0], self.group1()[1], self.group1()[2], self.group1()[3]]), g3: Simd32x4::from(0.0) - other.group1() } }
     }
@@ -6367,6 +6795,7 @@ impl Sub<Motor> for PointAndPlane {
 impl GeometricProduct<Motor> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_product(self, other: Motor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group0()[2]) * swizzle!(other.group0(), 3, 3, 0, 1) * Simd32x4::from([0.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group0()[3]) * swizzle!(other.group0(), 2, 2, 1, 0) * Simd32x4::from([0.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * swizzle!(other.group0(), 1, 1, 2, 3) * Simd32x4::from([0.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group0()[2], other.group1()[3], other.group1()[0], other.group1()[1]]) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group0()[3], other.group1()[2], other.group1()[1], other.group1()[0]]) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]) + swizzle!(self.group0(), 0, 1, 1, 1) * swizzle!(other.group0(), 0, 0, 3, 2) * Simd32x4::from([0.0, 1.0, 1.0, -1.0]), g1: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) * Simd32x4::from([1.0, -1.0, -1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from(other.group0()[2]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from(other.group0()[3]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from(other.group0()[0]) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group0()[0], other.group0()[1]]) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group0()[0]]) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + swizzle!(self.group0(), 1, 0, 0, 0) * swizzle!(other.group0(), 1, 0, 0, 0) * Simd32x4::from([1.0, 0.0, 0.0, 0.0]) } }
     }
@@ -6375,6 +6804,7 @@ impl GeometricProduct<Motor> for PointAndPlane {
 impl RegressiveProduct<Motor> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn regressive_product(self, other: Motor) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() * Simd32x4::from(other.group1()[0]), g1: Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group1()[1], other.group0()[3], other.group0()[2]]) * Simd32x4::from([-1.0, 0.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group0()[3], other.group1()[2], other.group0()[1]]) * Simd32x4::from([-1.0, -1.0, 0.0, 1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group0()[2], other.group0()[1], other.group1()[3]]) * Simd32x4::from([-1.0, 1.0, -1.0, 0.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 1.0, 0.0, 0.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 0.0, 1.0, 0.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from(other.group1()[0]) * Simd32x4::from([0.0, 0.0, 0.0, 1.0]) + Simd32x4::from([self.group1()[0], self.group0()[0], self.group0()[0], self.group0()[0]]) * other.group1() } }
     }
@@ -6407,12 +6837,14 @@ impl RightContraction<Motor> for PointAndPlane {
 impl Add<PointAndPlane> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn add(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() + other.group0(), g1: self.group1() + other.group1() } }
     }
 }
 
 impl AddAssign<PointAndPlane> for PointAndPlane {
+    #[inline(always)]
     fn add_assign(&mut self, other: PointAndPlane) {
         *self = (*self).add(other);
     }
@@ -6421,12 +6853,14 @@ impl AddAssign<PointAndPlane> for PointAndPlane {
 impl Sub<PointAndPlane> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn sub(self, other: PointAndPlane) -> PointAndPlane {
         PointAndPlane { groups: PointAndPlaneGroups { g0: self.group0() - other.group0(), g1: self.group1() - other.group1() } }
     }
 }
 
 impl SubAssign<PointAndPlane> for PointAndPlane {
+    #[inline(always)]
     fn sub_assign(&mut self, other: PointAndPlane) {
         *self = (*self).sub(other);
     }
@@ -6463,6 +6897,7 @@ impl DivAssign<PointAndPlane> for PointAndPlane {
 impl GeometricProduct<PointAndPlane> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_product(self, other: PointAndPlane) -> Motor {
         Motor { groups: MotorGroups { g0: Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) * Simd32x4::from([-1.0, 1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([1.0, -1.0, 1.0, 1.0]), g1: Simd32x4::from(0.0) - Simd32x4::from(self.group0()[0]) * Simd32x4::from([other.group1()[0], other.group0()[1], other.group0()[2], other.group0()[3]]) + Simd32x4::from(self.group0()[1]) * Simd32x4::from([other.group1()[1], other.group0()[0], other.group1()[3], other.group1()[2]]) * Simd32x4::from([-1.0, 1.0, -1.0, 1.0]) + Simd32x4::from(self.group0()[2]) * Simd32x4::from([other.group1()[2], other.group1()[3], other.group0()[0], other.group1()[1]]) * Simd32x4::from([-1.0, 1.0, 1.0, -1.0]) + Simd32x4::from(self.group0()[3]) * Simd32x4::from([other.group1()[3], other.group1()[2], other.group1()[1], other.group0()[0]]) * Simd32x4::from([-1.0, -1.0, 1.0, 1.0]) + Simd32x4::from(self.group1()[0]) * Simd32x4::from([other.group0()[0], other.group1()[1], other.group1()[2], other.group1()[3]]) + Simd32x4::from(self.group1()[1]) * Simd32x4::from([other.group0()[1], other.group1()[0], other.group0()[3], other.group0()[2]]) * Simd32x4::from([1.0, -1.0, 1.0, -1.0]) + Simd32x4::from(self.group1()[2]) * Simd32x4::from([other.group0()[2], other.group0()[3], other.group1()[0], other.group0()[1]]) * Simd32x4::from([1.0, -1.0, -1.0, 1.0]) + Simd32x4::from(self.group1()[3]) * Simd32x4::from([other.group0()[3], other.group0()[2], other.group0()[1], other.group1()[0]]) * Simd32x4::from([1.0, 1.0, -1.0, -1.0]) } }
     }
@@ -6471,6 +6906,7 @@ impl GeometricProduct<PointAndPlane> for PointAndPlane {
 impl ScalarProduct<PointAndPlane> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn scalar_product(self, other: PointAndPlane) -> Scalar {
         Scalar { groups: ScalarGroups { g0: 0.0 - self.group0()[0] * other.group0()[0] + self.group1()[1] * other.group1()[1] + self.group1()[2] * other.group1()[2] + self.group1()[3] * other.group1()[3] } }
     }
@@ -6479,6 +6915,7 @@ impl ScalarProduct<PointAndPlane> for PointAndPlane {
 impl SquaredMagnitude for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn squared_magnitude(self) -> Scalar {
         self.scalar_product(self.reversal())
     }
@@ -6487,6 +6924,7 @@ impl SquaredMagnitude for PointAndPlane {
 impl Magnitude for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn magnitude(self) -> Scalar {
         Scalar { groups: ScalarGroups { g0: self.squared_magnitude().group0().sqrt() } }
     }
@@ -6495,6 +6933,7 @@ impl Magnitude for PointAndPlane {
 impl Scale for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn scale(self, other: f32) -> PointAndPlane {
         self.geometric_product(Scalar { groups: ScalarGroups { g0: other } })
     }
@@ -6511,6 +6950,7 @@ impl Signum for PointAndPlane {
 impl Inverse for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn inverse(self) -> PointAndPlane {
         self.reversal().geometric_product(Scalar { groups: ScalarGroups { g0: 1.0 / self.squared_magnitude().group0() } })
     }
@@ -6519,6 +6959,7 @@ impl Inverse for PointAndPlane {
 impl GeometricQuotient<Scalar> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> IdealPoint {
         self.geometric_product(other.inverse())
     }
@@ -6527,6 +6968,7 @@ impl GeometricQuotient<Scalar> for IdealPoint {
 impl GeometricQuotient<Translator> for IdealPoint {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> IdealPoint {
         self.geometric_product(other.inverse())
     }
@@ -6535,6 +6977,7 @@ impl GeometricQuotient<Translator> for IdealPoint {
 impl GeometricQuotient<Line> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6543,6 +6986,7 @@ impl GeometricQuotient<Line> for Line {
 impl Transformation<Line> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6551,6 +6995,7 @@ impl Transformation<Line> for Line {
 impl GeometricQuotient<Motor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6559,6 +7004,7 @@ impl GeometricQuotient<Motor> for Line {
 impl Transformation<Motor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6567,6 +7013,7 @@ impl Transformation<Motor> for Line {
 impl GeometricQuotient<MultiVector> for Line {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6575,6 +7022,7 @@ impl GeometricQuotient<MultiVector> for Line {
 impl Transformation<MultiVector> for Line {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6583,6 +7031,7 @@ impl Transformation<MultiVector> for Line {
 impl GeometricQuotient<Plane> for Line {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6591,6 +7040,7 @@ impl GeometricQuotient<Plane> for Line {
 impl Transformation<Plane> for Line {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6599,6 +7049,7 @@ impl Transformation<Plane> for Line {
 impl GeometricQuotient<PointAndPlane> for Line {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6607,6 +7058,7 @@ impl GeometricQuotient<PointAndPlane> for Line {
 impl Transformation<PointAndPlane> for Line {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6615,6 +7067,7 @@ impl Transformation<PointAndPlane> for Line {
 impl GeometricQuotient<Rotor> for Line {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6623,6 +7076,7 @@ impl GeometricQuotient<Rotor> for Line {
 impl Transformation<Rotor> for Line {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6631,6 +7085,7 @@ impl Transformation<Rotor> for Line {
 impl GeometricQuotient<Scalar> for Line {
     type Output = Line;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Line {
         self.geometric_product(other.inverse())
     }
@@ -6639,6 +7094,7 @@ impl GeometricQuotient<Scalar> for Line {
 impl Transformation<Scalar> for Line {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6647,6 +7103,7 @@ impl Transformation<Scalar> for Line {
 impl GeometricQuotient<Line> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6655,6 +7112,7 @@ impl GeometricQuotient<Line> for Motor {
 impl Transformation<Line> for Motor {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6684,6 +7142,7 @@ impl Powi for Motor {
 impl GeometricQuotient<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6692,6 +7151,7 @@ impl GeometricQuotient<Motor> for Motor {
 impl Transformation<Motor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6700,6 +7160,7 @@ impl Transformation<Motor> for Motor {
 impl GeometricQuotient<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6708,6 +7169,7 @@ impl GeometricQuotient<MultiVector> for Motor {
 impl Transformation<MultiVector> for Motor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6716,6 +7178,7 @@ impl Transformation<MultiVector> for Motor {
 impl GeometricQuotient<Plane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6724,6 +7187,7 @@ impl GeometricQuotient<Plane> for Motor {
 impl Transformation<Plane> for Motor {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6732,6 +7196,7 @@ impl Transformation<Plane> for Motor {
 impl GeometricQuotient<Point> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6740,6 +7205,7 @@ impl GeometricQuotient<Point> for Motor {
 impl Transformation<Point> for Motor {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6748,6 +7214,7 @@ impl Transformation<Point> for Motor {
 impl GeometricQuotient<PointAndPlane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6756,6 +7223,7 @@ impl GeometricQuotient<PointAndPlane> for Motor {
 impl Transformation<PointAndPlane> for Motor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6764,6 +7232,7 @@ impl Transformation<PointAndPlane> for Motor {
 impl GeometricQuotient<Rotor> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6772,6 +7241,7 @@ impl GeometricQuotient<Rotor> for Motor {
 impl Transformation<Rotor> for Motor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6780,6 +7250,7 @@ impl Transformation<Rotor> for Motor {
 impl GeometricQuotient<Scalar> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6788,6 +7259,7 @@ impl GeometricQuotient<Scalar> for Motor {
 impl Transformation<Scalar> for Motor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6796,6 +7268,7 @@ impl Transformation<Scalar> for Motor {
 impl GeometricQuotient<Translator> for Motor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -6804,6 +7277,7 @@ impl GeometricQuotient<Translator> for Motor {
 impl Transformation<Translator> for Motor {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6812,6 +7286,7 @@ impl Transformation<Translator> for Motor {
 impl GeometricQuotient<Line> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6820,6 +7295,7 @@ impl GeometricQuotient<Line> for MultiVector {
 impl Transformation<Line> for MultiVector {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6828,6 +7304,7 @@ impl Transformation<Line> for MultiVector {
 impl GeometricQuotient<Motor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6836,6 +7313,7 @@ impl GeometricQuotient<Motor> for MultiVector {
 impl Transformation<Motor> for MultiVector {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6865,6 +7343,7 @@ impl Powi for MultiVector {
 impl GeometricQuotient<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6873,6 +7352,7 @@ impl GeometricQuotient<MultiVector> for MultiVector {
 impl Transformation<MultiVector> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -6881,6 +7361,7 @@ impl Transformation<MultiVector> for MultiVector {
 impl GeometricQuotient<Plane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6889,6 +7370,7 @@ impl GeometricQuotient<Plane> for MultiVector {
 impl Transformation<Plane> for MultiVector {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6897,6 +7379,7 @@ impl Transformation<Plane> for MultiVector {
 impl GeometricQuotient<Point> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6905,6 +7388,7 @@ impl GeometricQuotient<Point> for MultiVector {
 impl Transformation<Point> for MultiVector {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6913,6 +7397,7 @@ impl Transformation<Point> for MultiVector {
 impl GeometricQuotient<PointAndPlane> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6921,6 +7406,7 @@ impl GeometricQuotient<PointAndPlane> for MultiVector {
 impl Transformation<PointAndPlane> for MultiVector {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6929,6 +7415,7 @@ impl Transformation<PointAndPlane> for MultiVector {
 impl GeometricQuotient<Rotor> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6937,6 +7424,7 @@ impl GeometricQuotient<Rotor> for MultiVector {
 impl Transformation<Rotor> for MultiVector {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6945,6 +7433,7 @@ impl Transformation<Rotor> for MultiVector {
 impl GeometricQuotient<Scalar> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6953,6 +7442,7 @@ impl GeometricQuotient<Scalar> for MultiVector {
 impl Transformation<Scalar> for MultiVector {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6961,6 +7451,7 @@ impl Transformation<Scalar> for MultiVector {
 impl GeometricQuotient<Translator> for MultiVector {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -6969,6 +7460,7 @@ impl GeometricQuotient<Translator> for MultiVector {
 impl Transformation<Translator> for MultiVector {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6977,6 +7469,7 @@ impl Transformation<Translator> for MultiVector {
 impl GeometricQuotient<Line> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -6985,6 +7478,7 @@ impl GeometricQuotient<Line> for Plane {
 impl Transformation<Line> for Plane {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -6993,6 +7487,7 @@ impl Transformation<Line> for Plane {
 impl GeometricQuotient<Motor> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7001,6 +7496,7 @@ impl GeometricQuotient<Motor> for Plane {
 impl Transformation<Motor> for Plane {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7009,6 +7505,7 @@ impl Transformation<Motor> for Plane {
 impl GeometricQuotient<MultiVector> for Plane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7017,6 +7514,7 @@ impl GeometricQuotient<MultiVector> for Plane {
 impl Transformation<MultiVector> for Plane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7025,6 +7523,7 @@ impl Transformation<MultiVector> for Plane {
 impl GeometricQuotient<PointAndPlane> for Plane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7033,6 +7532,7 @@ impl GeometricQuotient<PointAndPlane> for Plane {
 impl Transformation<PointAndPlane> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7041,6 +7541,7 @@ impl Transformation<PointAndPlane> for Plane {
 impl GeometricQuotient<Rotor> for Plane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7049,6 +7550,7 @@ impl GeometricQuotient<Rotor> for Plane {
 impl Transformation<Rotor> for Plane {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7057,6 +7559,7 @@ impl Transformation<Rotor> for Plane {
 impl GeometricQuotient<Scalar> for Plane {
     type Output = Plane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Plane {
         self.geometric_product(other.inverse())
     }
@@ -7065,6 +7568,7 @@ impl GeometricQuotient<Scalar> for Plane {
 impl GeometricQuotient<Motor> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7073,6 +7577,7 @@ impl GeometricQuotient<Motor> for Point {
 impl Transformation<Motor> for Point {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7081,6 +7586,7 @@ impl Transformation<Motor> for Point {
 impl GeometricQuotient<MultiVector> for Point {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7089,6 +7595,7 @@ impl GeometricQuotient<MultiVector> for Point {
 impl Transformation<MultiVector> for Point {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7097,6 +7604,7 @@ impl Transformation<MultiVector> for Point {
 impl GeometricQuotient<Point> for Point {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> Translator {
         self.geometric_product(other.inverse())
     }
@@ -7105,6 +7613,7 @@ impl GeometricQuotient<Point> for Point {
 impl Transformation<Point> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7113,6 +7622,7 @@ impl Transformation<Point> for Point {
 impl GeometricQuotient<PointAndPlane> for Point {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7121,6 +7631,7 @@ impl GeometricQuotient<PointAndPlane> for Point {
 impl Transformation<PointAndPlane> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7129,6 +7640,7 @@ impl Transformation<PointAndPlane> for Point {
 impl GeometricQuotient<Rotor> for Point {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7137,6 +7649,7 @@ impl GeometricQuotient<Rotor> for Point {
 impl Transformation<Rotor> for Point {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7145,6 +7658,7 @@ impl Transformation<Rotor> for Point {
 impl GeometricQuotient<Scalar> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Point {
         self.geometric_product(other.inverse())
     }
@@ -7153,6 +7667,7 @@ impl GeometricQuotient<Scalar> for Point {
 impl Transformation<Scalar> for Point {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7161,6 +7676,7 @@ impl Transformation<Scalar> for Point {
 impl GeometricQuotient<Translator> for Point {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> Point {
         self.geometric_product(other.inverse())
     }
@@ -7169,6 +7685,7 @@ impl GeometricQuotient<Translator> for Point {
 impl Transformation<Translator> for Point {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7177,6 +7694,7 @@ impl Transformation<Translator> for Point {
 impl GeometricQuotient<Line> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7185,6 +7703,7 @@ impl GeometricQuotient<Line> for PointAndPlane {
 impl Transformation<Line> for PointAndPlane {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7193,6 +7712,7 @@ impl Transformation<Line> for PointAndPlane {
 impl GeometricQuotient<Motor> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7201,6 +7721,7 @@ impl GeometricQuotient<Motor> for PointAndPlane {
 impl Transformation<Motor> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7209,6 +7730,7 @@ impl Transformation<Motor> for PointAndPlane {
 impl GeometricQuotient<MultiVector> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7217,6 +7739,7 @@ impl GeometricQuotient<MultiVector> for PointAndPlane {
 impl Transformation<MultiVector> for PointAndPlane {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7225,6 +7748,7 @@ impl Transformation<MultiVector> for PointAndPlane {
 impl GeometricQuotient<Plane> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7233,6 +7757,7 @@ impl GeometricQuotient<Plane> for PointAndPlane {
 impl Transformation<Plane> for PointAndPlane {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7241,6 +7766,7 @@ impl Transformation<Plane> for PointAndPlane {
 impl GeometricQuotient<Point> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7249,6 +7775,7 @@ impl GeometricQuotient<Point> for PointAndPlane {
 impl Transformation<Point> for PointAndPlane {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7257,6 +7784,7 @@ impl Transformation<Point> for PointAndPlane {
 impl GeometricQuotient<PointAndPlane> for PointAndPlane {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7265,6 +7793,7 @@ impl GeometricQuotient<PointAndPlane> for PointAndPlane {
 impl Transformation<PointAndPlane> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7273,6 +7802,7 @@ impl Transformation<PointAndPlane> for PointAndPlane {
 impl GeometricQuotient<Rotor> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7281,6 +7811,7 @@ impl GeometricQuotient<Rotor> for PointAndPlane {
 impl Transformation<Rotor> for PointAndPlane {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7289,6 +7820,7 @@ impl Transformation<Rotor> for PointAndPlane {
 impl GeometricQuotient<Scalar> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7297,6 +7829,7 @@ impl GeometricQuotient<Scalar> for PointAndPlane {
 impl Transformation<Scalar> for PointAndPlane {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7305,6 +7838,7 @@ impl Transformation<Scalar> for PointAndPlane {
 impl GeometricQuotient<Translator> for PointAndPlane {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7313,6 +7847,7 @@ impl GeometricQuotient<Translator> for PointAndPlane {
 impl Transformation<Translator> for PointAndPlane {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7321,6 +7856,7 @@ impl Transformation<Translator> for PointAndPlane {
 impl GeometricQuotient<Line> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7329,6 +7865,7 @@ impl GeometricQuotient<Line> for Rotor {
 impl Transformation<Line> for Rotor {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7337,6 +7874,7 @@ impl Transformation<Line> for Rotor {
 impl GeometricQuotient<Motor> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7345,6 +7883,7 @@ impl GeometricQuotient<Motor> for Rotor {
 impl Transformation<Motor> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7353,6 +7892,7 @@ impl Transformation<Motor> for Rotor {
 impl GeometricQuotient<MultiVector> for Rotor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7361,6 +7901,7 @@ impl GeometricQuotient<MultiVector> for Rotor {
 impl Transformation<MultiVector> for Rotor {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7369,6 +7910,7 @@ impl Transformation<MultiVector> for Rotor {
 impl GeometricQuotient<Plane> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7377,6 +7919,7 @@ impl GeometricQuotient<Plane> for Rotor {
 impl Transformation<Plane> for Rotor {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7385,6 +7928,7 @@ impl Transformation<Plane> for Rotor {
 impl GeometricQuotient<Point> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7393,6 +7937,7 @@ impl GeometricQuotient<Point> for Rotor {
 impl Transformation<Point> for Rotor {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7401,6 +7946,7 @@ impl Transformation<Point> for Rotor {
 impl GeometricQuotient<PointAndPlane> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7409,6 +7955,7 @@ impl GeometricQuotient<PointAndPlane> for Rotor {
 impl Transformation<PointAndPlane> for Rotor {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7438,6 +7985,7 @@ impl Powi for Rotor {
 impl GeometricQuotient<Rotor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> Rotor {
         self.geometric_product(other.inverse())
     }
@@ -7446,6 +7994,7 @@ impl GeometricQuotient<Rotor> for Rotor {
 impl Transformation<Rotor> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7454,6 +8003,7 @@ impl Transformation<Rotor> for Rotor {
 impl GeometricQuotient<Scalar> for Rotor {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Rotor {
         self.geometric_product(other.inverse())
     }
@@ -7462,6 +8012,7 @@ impl GeometricQuotient<Scalar> for Rotor {
 impl Transformation<Scalar> for Rotor {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7470,6 +8021,7 @@ impl Transformation<Scalar> for Rotor {
 impl GeometricQuotient<Translator> for Rotor {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7478,6 +8030,7 @@ impl GeometricQuotient<Translator> for Rotor {
 impl Transformation<Translator> for Rotor {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7486,6 +8039,7 @@ impl Transformation<Translator> for Rotor {
 impl Transformation<IdealPoint> for Scalar {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn transformation(self, other: IdealPoint) -> IdealPoint {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7494,6 +8048,7 @@ impl Transformation<IdealPoint> for Scalar {
 impl GeometricQuotient<Line> for Scalar {
     type Output = Line;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Line) -> Line {
         self.geometric_product(other.inverse())
     }
@@ -7502,6 +8057,7 @@ impl GeometricQuotient<Line> for Scalar {
 impl Transformation<Line> for Scalar {
     type Output = Line;
 
+    #[inline(always)]
     fn transformation(self, other: Line) -> Line {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7510,6 +8066,7 @@ impl Transformation<Line> for Scalar {
 impl GeometricQuotient<Motor> for Scalar {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7518,6 +8075,7 @@ impl GeometricQuotient<Motor> for Scalar {
 impl Transformation<Motor> for Scalar {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7526,6 +8084,7 @@ impl Transformation<Motor> for Scalar {
 impl GeometricQuotient<MultiVector> for Scalar {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7534,6 +8093,7 @@ impl GeometricQuotient<MultiVector> for Scalar {
 impl Transformation<MultiVector> for Scalar {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7542,6 +8102,7 @@ impl Transformation<MultiVector> for Scalar {
 impl GeometricQuotient<Plane> for Scalar {
     type Output = Plane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Plane) -> Plane {
         self.geometric_product(other.inverse())
     }
@@ -7550,6 +8111,7 @@ impl GeometricQuotient<Plane> for Scalar {
 impl Transformation<Plane> for Scalar {
     type Output = Plane;
 
+    #[inline(always)]
     fn transformation(self, other: Plane) -> Plane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7558,6 +8120,7 @@ impl Transformation<Plane> for Scalar {
 impl GeometricQuotient<Point> for Scalar {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> Point {
         self.geometric_product(other.inverse())
     }
@@ -7566,6 +8129,7 @@ impl GeometricQuotient<Point> for Scalar {
 impl Transformation<Point> for Scalar {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7574,6 +8138,7 @@ impl Transformation<Point> for Scalar {
 impl GeometricQuotient<PointAndPlane> for Scalar {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7582,6 +8147,7 @@ impl GeometricQuotient<PointAndPlane> for Scalar {
 impl Transformation<PointAndPlane> for Scalar {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7590,6 +8156,7 @@ impl Transformation<PointAndPlane> for Scalar {
 impl GeometricQuotient<Rotor> for Scalar {
     type Output = Rotor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> Rotor {
         self.geometric_product(other.inverse())
     }
@@ -7598,6 +8165,7 @@ impl GeometricQuotient<Rotor> for Scalar {
 impl Transformation<Rotor> for Scalar {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7627,6 +8195,7 @@ impl Powi for Scalar {
 impl GeometricQuotient<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Scalar {
         self.geometric_product(other.inverse())
     }
@@ -7635,6 +8204,7 @@ impl GeometricQuotient<Scalar> for Scalar {
 impl Transformation<Scalar> for Scalar {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7643,6 +8213,7 @@ impl Transformation<Scalar> for Scalar {
 impl GeometricQuotient<Translator> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> Translator {
         self.geometric_product(other.inverse())
     }
@@ -7651,6 +8222,7 @@ impl GeometricQuotient<Translator> for Scalar {
 impl Transformation<Translator> for Scalar {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7659,6 +8231,7 @@ impl Transformation<Translator> for Scalar {
 impl Transformation<IdealPoint> for Translator {
     type Output = IdealPoint;
 
+    #[inline(always)]
     fn transformation(self, other: IdealPoint) -> IdealPoint {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7667,6 +8240,7 @@ impl Transformation<IdealPoint> for Translator {
 impl GeometricQuotient<Motor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Motor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7675,6 +8249,7 @@ impl GeometricQuotient<Motor> for Translator {
 impl Transformation<Motor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn transformation(self, other: Motor) -> Motor {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7683,6 +8258,7 @@ impl Transformation<Motor> for Translator {
 impl GeometricQuotient<MultiVector> for Translator {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other.inverse())
     }
@@ -7691,6 +8267,7 @@ impl GeometricQuotient<MultiVector> for Translator {
 impl Transformation<MultiVector> for Translator {
     type Output = MultiVector;
 
+    #[inline(always)]
     fn transformation(self, other: MultiVector) -> MultiVector {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7699,6 +8276,7 @@ impl Transformation<MultiVector> for Translator {
 impl GeometricQuotient<Point> for Translator {
     type Output = Point;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Point) -> Point {
         self.geometric_product(other.inverse())
     }
@@ -7707,6 +8285,7 @@ impl GeometricQuotient<Point> for Translator {
 impl Transformation<Point> for Translator {
     type Output = Point;
 
+    #[inline(always)]
     fn transformation(self, other: Point) -> Point {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7715,6 +8294,7 @@ impl Transformation<Point> for Translator {
 impl GeometricQuotient<PointAndPlane> for Translator {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other.inverse())
     }
@@ -7723,6 +8303,7 @@ impl GeometricQuotient<PointAndPlane> for Translator {
 impl Transformation<PointAndPlane> for Translator {
     type Output = PointAndPlane;
 
+    #[inline(always)]
     fn transformation(self, other: PointAndPlane) -> PointAndPlane {
         self.geometric_product(other).geometric_product(self.reversal())
     }
@@ -7731,6 +8312,7 @@ impl Transformation<PointAndPlane> for Translator {
 impl GeometricQuotient<Rotor> for Translator {
     type Output = Motor;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Rotor) -> Motor {
         self.geometric_product(other.inverse())
     }
@@ -7739,6 +8321,7 @@ impl GeometricQuotient<Rotor> for Translator {
 impl Transformation<Rotor> for Translator {
     type Output = Rotor;
 
+    #[inline(always)]
     fn transformation(self, other: Rotor) -> Rotor {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7747,6 +8330,7 @@ impl Transformation<Rotor> for Translator {
 impl GeometricQuotient<Scalar> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Scalar) -> Translator {
         self.geometric_product(other.inverse())
     }
@@ -7755,6 +8339,7 @@ impl GeometricQuotient<Scalar> for Translator {
 impl Transformation<Scalar> for Translator {
     type Output = Scalar;
 
+    #[inline(always)]
     fn transformation(self, other: Scalar) -> Scalar {
         self.geometric_product(other).geometric_product(self.reversal()).into()
     }
@@ -7784,6 +8369,7 @@ impl Powi for Translator {
 impl GeometricQuotient<Translator> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn geometric_quotient(self, other: Translator) -> Translator {
         self.geometric_product(other.inverse())
     }
@@ -7792,6 +8378,7 @@ impl GeometricQuotient<Translator> for Translator {
 impl Transformation<Translator> for Translator {
     type Output = Translator;
 
+    #[inline(always)]
     fn transformation(self, other: Translator) -> Translator {
         self.geometric_product(other).geometric_product(self.reversal())
     }
