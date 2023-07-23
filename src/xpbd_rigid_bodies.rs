@@ -531,6 +531,7 @@ fn resolve_collisions(
     }
 }
 
+#[inline(never)]
 fn resolve_compliant_fixed_angle_constraints(
     compliant_fixed_angle_constraints: &[CompliantFixedAngleConstraint],
     motors_next: &mut [ppga3d::Motor],
