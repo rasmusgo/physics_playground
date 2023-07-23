@@ -1,0 +1,23 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [],
+    "dictionaries": [],
+    "words": [
+        "bivector",
+        "consts",
+        "forque",
+        "forques",
+        "lerp",
+        "linspace",
+        "ppga",
+        "repr",
+        "seedable",
+        "simd",
+        "stiction",
+        "subalgebra",
+        "xpbd"
+    ],
+    "ignoreWords": [],
+    "import": []
+}
