@@ -17,6 +17,7 @@ pub union Scalar {
 
 impl Scalar {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(value: f32) -> Self {
         Self { elements: [value] }
     }
@@ -103,6 +104,7 @@ pub union MultiVector {
 
 impl MultiVector {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(one: f32, e23: f32, e31: f32, e12: f32, e0: f32, e032: f32, e013: f32, e021: f32, e123: f32, e1: f32, e2: f32, e3: f32, e0123: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e23, e31, e12, e0, e032, e013, e021, e123, e1, e2, e3, e0123, e01, e02, e03] }
     }
@@ -210,6 +212,7 @@ pub union Rotor {
 
 impl Rotor {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(one: f32, e32: f32, e31: f32, e12: f32) -> Self {
         Self { elements: [one, e32, e31, e12] }
     }
@@ -281,6 +284,7 @@ pub union Point {
 
 impl Point {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(e123: f32, e032: f32, e013: f32, e021: f32) -> Self {
         Self { elements: [e123, e032, e013, e021] }
     }
@@ -352,6 +356,7 @@ pub union IdealPoint {
 
 impl IdealPoint {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [e01, e02, e03, 0.0] }
     }
@@ -422,6 +427,7 @@ pub union Plane {
 
 impl Plane {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(e0: f32, e1: f32, e2: f32, e3: f32) -> Self {
         Self { elements: [e0, e1, e2, e3] }
     }
@@ -495,6 +501,7 @@ pub union Line {
 
 impl Line {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(e01: f32, e02: f32, e03: f32, e23: f32, e31: f32, e12: f32) -> Self {
         Self { elements: [e01, e02, e03, 0.0, e23, e31, e12, 0.0] }
     }
@@ -576,6 +583,7 @@ pub union Translator {
 
 impl Translator {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(one: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e01, e02, e03] }
     }
@@ -649,6 +657,7 @@ pub union Motor {
 
 impl Motor {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(one: f32, e23: f32, e31: f32, e12: f32, e0123: f32, e01: f32, e02: f32, e03: f32) -> Self {
         Self { elements: [one, e23, e31, e12, e0123, e01, e02, e03] }
     }
@@ -734,6 +743,7 @@ pub union PointAndPlane {
 
 impl PointAndPlane {
     #[allow(clippy::too_many_arguments)]
+    #[inline(always)]
     pub const fn new(e123: f32, e032: f32, e013: f32, e021: f32, e0: f32, e1: f32, e2: f32, e3: f32) -> Self {
         Self { elements: [e123, e032, e013, e021, e0, e1, e2, e3] }
     }
