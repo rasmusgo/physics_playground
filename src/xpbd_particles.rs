@@ -5,7 +5,6 @@ use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 use rerun::{
     components::{ColorRGBA, Point3D, Radius, ViewCoordinates},
     coordinates::{Handedness, SignedAxis3},
-    demo_util::lerp,
     external::glam::{self, vec3, Vec3},
     time::{Time, TimeType, Timeline},
     MsgSender, RecordingStreamBuilder,
@@ -22,6 +21,18 @@ enum ContactState {
 struct Contact {
     point: Vec3,
     state: ContactState,
+}
+
+/// Linear interpolator.
+#[inline]
+pub fn lerp<T>(a: T, b: T, t: f32) -> <<f32 as Mul<T>>::Output as std::ops::Add>::Output
+where
+    T: Mul<f32>,
+    f32: Mul<T>,
+    <T as Mul<f32>>::Output: Add<<f32 as Mul<T>>::Output>,
+    <f32 as Mul<T>>::Output: Add,
+{
+    (1.0 - t) * a + t * b
 }
 
 /// Linearly interpolates from `a` through `b` in `n` steps, returning the intermediate result at

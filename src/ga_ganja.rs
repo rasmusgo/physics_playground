@@ -5,7 +5,6 @@ mod rr {
     pub use rerun::{
         components::{Arrow3D, ColorRGBA, Point3D, Radius, Vec3D, ViewCoordinates},
         coordinates::{Handedness, SignedAxis3},
-        demo_util::lerp,
         external::glam::{self, vec3, Vec3},
         time::{Time, TimeType, Timeline},
         MsgSender, RecordingStreamBuilder,
