@@ -255,7 +255,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let nx = 10;
     let ny = 10;
     let nz = 10;
-    let mut points_curr = grid(
+    let points = grid(
         vec3(-1.0 + offset_x, -1.0, 2.0),
         vec3(1.0 + offset_x, 1.0, 2.0 + (nz as f32 - 1.0) * 0.2),
         nx,
@@ -264,7 +264,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .collect::<Vec<_>>();
     let mut compliant_fixed_angle_constraints = create_constraints(
-        &points_curr,
+        &points,
         nx,
         ny,
         nz,
@@ -275,7 +275,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     compliant_fixed_angle_constraints.shuffle(&mut rng);
     let compliant_fixed_angle_constraints = compliant_fixed_angle_constraints;
 
-    let colors = points_curr
+    let colors = points
         .iter()
         .map(|_| {
             ColorRGBA::from_rgb(
@@ -285,7 +285,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
         })
         .collect::<Vec<_>>();
-    let radius = Radius(0.025);
     MsgSender::new("world")
         .with_timeless(true)
         .with_splat(ViewCoordinates::from_up_and_handedness(
@@ -300,7 +299,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             y: 0.1,
             z: 0.1,
         };
-        points_curr.len()
+        points.len()
     ];
 
     let inner_r = 1.0;
@@ -315,23 +314,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send(&recording)?;
 
     let gravity_vector = ppga3d::Line::new(0.0, 0.0, -9.82, 0.0, 0.0, 0.0);
-    let mut motors_curr = points_curr
+    let mut motors_curr = points
         .iter()
         .map(|&p| ppga3d::Motor::new(1., 0., 0., 0., 0., -0.5 * p.x, -0.5 * p.y, -0.5 * p.z))
         .collect::<Vec<_>>();
 
-    let mut rate_in_body = vec![ppga3d::Line::zero(); points_curr.len()];
-    // let mut rate_in_body = vec![ppga3d::Line::new(0.0, 0.0, 0.0, 1.0, 0.0, 0.0); points_curr.len()];
+    let mut rate_in_body = vec![ppga3d::Line::zero(); points.len()];
     let mut active_collisions = Vec::<Option<Contact>>::new();
-    active_collisions.resize_with(points_curr.len(), Default::default);
+    active_collisions.resize_with(points.len(), Default::default);
     for i in 0..5000 {
         puffin::GlobalProfiler::lock().new_frame();
         puffin::profile_scope!("physics step");
         let time = i as f32 * dt;
 
-        // Update velocities
+        // Apply external forces
         {
-            puffin::profile_scope!("update velocities");
+            puffin::profile_scope!("Apply external forces");
             for (b, m) in rate_in_body.iter_mut().zip(motors_curr.iter()) {
                 let gravity =
                     inertia_map.rate_to_momentum(m.reversal().transformation(gravity_vector));
@@ -370,68 +368,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // Resolve constraints
-        // for constraint in &compliant_fixed_angle_constraints {
-        //     let node_a = constraint.node_a;
-        //     let node_b = constraint.node_b;
-        //     let motor1 = motors_next[node_a];
-        //     let motor2 = motors_next[node_b];
-        //     let p1_in_world = motor1.transformation(constraint.point_in_a.to_ppga_point());
-        //     let p2_in_world = motor2.transformation(constraint.point_in_b.to_ppga_point());
-        //     let join_line = p1_in_world.regressive_product(p2_in_world);
-        //     let c: f32 = join_line.magnitude().into();
-        //     if c <= 0.0 {
-        //         continue;
-        //     }
-        //     let n_in_world = join_line.scale(1.0 / c);
-        //     let n_in_a = motor1.reversal().transformation(n_in_world);
-        //     let n_in_b = motor2.reversal().transformation(n_in_world);
-        //     let s_in_a = inertia_map.momentum_to_rate(n_in_a);
-        //     let s_in_b = inertia_map.momentum_to_rate(n_in_b);
-        //     let w1: f32 = s_in_a.regressive_product(n_in_a).into();
-        //     let w2: f32 = s_in_b.regressive_product(n_in_b).into();
-        //     let correction = -c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
-        //     let u_in_a = s_in_a.scale(-correction);
-        //     let u_in_b = s_in_b.scale(correction);
-        //     motors_next[node_a] -= motor1.geometric_product(u_in_a).scale(0.5);
-        //     motors_next[node_b] -= motor2.geometric_product(u_in_b).scale(0.5);
-        //     motors_next[node_a] =
-        //         motors_next[node_a].geometric_product(motors_next[node_a].magnitude().inverse());
-        //     motors_next[node_b] =
-        //         motors_next[node_b].geometric_product(motors_next[node_b].magnitude().inverse());
-        // }
         resolve_compliant_fixed_angle_constraints(
             &compliant_fixed_angle_constraints,
             &mut motors_next,
             &inertia_map,
             dt,
         );
-        // for constraint in &compliant_fixed_angle_constraints {
-        //     let node_a = constraint.node_a;
-        //     let node_b = constraint.node_b;
-        //     let stage_from_a = orientations_next[node_a];
-        //     let stage_from_b = orientations_next[node_b];
-        //     let stage_from_wanted_b = stage_from_a * constraint.b_in_a;
-        //     let delta = stage_from_b * stage_from_wanted_b.inverse();
-        //     let (axis, mut angle) = delta.to_axis_angle();
-        //     if angle > PI {
-        //         angle -= TAU;
-        //     }
-        //     let w1 = inv_inertia;
-        //     let w2 = inv_inertia;
-        //     let lambda = -angle / (w1 + w2 + constraint.angular_compliance / (dt * dt));
-        //     let delta1 = Quat::from_vec4((inv_inertia * axis * lambda).extend(0.0));
-        //     let delta2 = Quat::from_vec4((inv_inertia * axis * lambda).extend(0.0));
-        //     orientations_next[node_a] = Quat::from_vec4(
-        //         Vec4::from(orientations_next[node_a])
-        //             + 0.5 * Vec4::from(delta1 /* * orientations_next[node_a]*/),
-        //     )
-        //     .normalize();
-        //     orientations_next[node_b] = Quat::from_vec4(
-        //         Vec4::from(orientations_next[node_b])
-        //             - 0.5 * Vec4::from(delta2 /* * orientations_next[node_b]*/),
-        //     )
-        //     .normalize();
-        // }
 
         // Update velocities (including angular velocity)
         {
