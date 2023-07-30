@@ -11,9 +11,9 @@ path = "src/xpbd_rigid_bodies.rs"
 name = "xpbd_particles"
 path = "src/xpbd_particles.rs"
 
-[[bin]]
-name = "ga_g3"
-path = "src/ga_g3.rs"
+# [[bin]]
+# name = "ga_g3"
+# path = "src/ga_g3.rs"
 
 [[bin]]
 name = "ga_ppga3d"
@@ -26,14 +26,14 @@ path = "src/ga_ganja.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-g3 = "0.1.4"
+# g3 = "0.1.4"
 geometric_algebra = { path = "geometric_algebra" }
 itertools = "0.10.5"
 nalgebra = { version = "0.32.1", features = ["convert-glam022"] }
 puffin = "0.16.0"
 puffin_http = "0.13.0"
 rand = "0.8.5"
-rerun = { version = "0.7", default-features = false, features = [
+rerun = { version = "0.8", default-features = false, features = [
     "sdk",
     "glam",
 ] }

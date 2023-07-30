@@ -247,8 +247,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let angular_compliance = 0.001;
     let stiction_factor = 0.25; // Maximum tangential correction per correction along normal.
 
-    let recording =
-        RecordingStreamBuilder::new("XPBD rigid bodies").connect(rerun::default_server_addr())?;
+    let recording = RecordingStreamBuilder::new("XPBD rigid bodies")
+        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
 
     let stable_time = Timeline::new("stable_time", TimeType::Time);
 
