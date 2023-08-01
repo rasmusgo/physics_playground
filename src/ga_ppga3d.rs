@@ -106,7 +106,7 @@ fn forques(state: &State) -> ppga3d::Line {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let recording = rr::RecordingStreamBuilder::new("GA physics ppga3d")
-        .connect(rerun::default_server_addr())?;
+        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
     let stable_time = rr::Timeline::new("stable_time", rr::TimeType::Time);
     rr::MsgSender::new("world")
         .with_timeless(true)

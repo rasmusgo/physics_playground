@@ -74,8 +74,8 @@ fn forques(state: &State) -> PGA3D {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let recording =
-        rr::RecordingStreamBuilder::new("GA physics ganja").connect(rerun::default_server_addr())?;
+    let recording = rr::RecordingStreamBuilder::new("GA physics ganja")
+        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
     let stable_time = rr::Timeline::new("stable_time", rr::TimeType::Time);
     rr::MsgSender::new("world")
         .with_timeless(true)
