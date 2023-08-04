@@ -596,13 +596,13 @@ fn test_resolve_compliant_fixed_angle_constraints() {
     let mut rng = StdRng::seed_from_u64(5);
 
     let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
-    let inertia_map = InertiaMap::new(1.0, vec3(1.0, 1.0, 1.0));
+    let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
     let dt = 0.001;
     let compliant_fixed_angle_constraints = vec![CompliantFixedAngleConstraint {
         node_a: 0,
         node_b: 1,
-        point_in_a: glam::Vec3::new(0.1, 0.0, 0.0),
-        point_in_b: glam::Vec3::new(0.0, 0.0, 0.0),
+        point_in_a: glam::Vec3::new(0.1, 0.0, 0.05),
+        point_in_b: glam::Vec3::new(-0.1, 0.0, 0.05),
         b_in_a: glam::Quat::IDENTITY,
         positional_compliance: 0.0,
         angular_compliance: 0.0,
@@ -639,7 +639,7 @@ fn test_resolve_compliant_fixed_angle_constraints() {
     )
     .unwrap();
 
-    for i in 1..5 {
+    for i in 1..=10 {
         let time = i as f32 * dt;
 
         resolve_compliant_fixed_angle_constraints(
@@ -712,13 +712,13 @@ fn test_resolve_compliant_spherical_constraints() {
     let mut rng = StdRng::seed_from_u64(5);
 
     let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
-    let inertia_map = InertiaMap::new(1.0, vec3(1.0, 1.0, 1.0));
+    let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
     let dt = 0.001;
     let compliant_spherical_constraints = vec![CompliantSphericalConstraint {
         node_a: 0,
         node_b: 1,
-        point_in_a: glam::Vec3::new(0.1, 0.0, 0.0),
-        point_in_b: glam::Vec3::new(0.0, 0.0, 0.0),
+        point_in_a: glam::Vec3::new(0.1, 0.0, 0.1),
+        point_in_b: glam::Vec3::new(-0.1, 0.0, 0.1),
         positional_compliance: 0.0,
     }];
 
