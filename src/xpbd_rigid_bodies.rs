@@ -550,12 +550,12 @@ fn resolve_compliant_fixed_angle_constraints(
     for constraint in compliant_fixed_angle_constraints {
         let node_a = constraint.node_a;
         let node_b = constraint.node_b;
-        let motor1 = motors_next[node_a];
-        let motor2 = motors_next[node_b];
+        let world_from_a = motors_next[node_a];
+        let world_from_b = motors_next[node_b];
         let a_from_anchor_a = constraint.point_in_a.to_ppga_translator();
         let b_from_anchor_b = constraint.point_in_b.to_ppga_translator();
-        let world_from_anchor_a = motor1.geometric_product(a_from_anchor_a);
-        let world_from_anchor_b = motor2.geometric_product(b_from_anchor_b);
+        let world_from_anchor_a = world_from_a.geometric_product(a_from_anchor_a);
+        let world_from_anchor_b = world_from_b.geometric_product(b_from_anchor_b);
         let anchor_a_from_anchor_b = world_from_anchor_a
             .reversal()
             .geometric_product(world_from_anchor_b);
@@ -577,8 +577,8 @@ fn resolve_compliant_fixed_angle_constraints(
         let correction = c / (w1 + w2 + constraint.angular_compliance / (dt * dt));
         let u_in_a = s_in_a.scale(-correction);
         let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= motor1.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= motor2.geometric_product(u_in_b).scale(0.5);
+        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
+        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
         motors_next[node_a] =
             motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
         motors_next[node_b] =
@@ -673,9 +673,9 @@ fn resolve_compliant_spherical_constraints(
     for constraint in compliant_spherical_constraints {
         let node_a = constraint.node_a;
         let node_b = constraint.node_b;
-        let motor1 = motors_next[node_a];
-        let motor2 = motors_next[node_b];
-        let a_from_b = motor1.reversal().geometric_product(motor2);
+        let world_from_a = motors_next[node_a];
+        let world_from_b = motors_next[node_b];
+        let a_from_b = world_from_a.reversal().geometric_product(world_from_b);
         let point_a_in_a = constraint.point_in_a.to_ppga_point();
         let point_b_in_b = constraint.point_in_b.to_ppga_point();
         let point_b_in_a = a_from_b.transformation(point_b_in_b);
@@ -693,8 +693,8 @@ fn resolve_compliant_spherical_constraints(
         let correction = c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
         let u_in_a = s_in_a.scale(-correction);
         let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= motor1.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= motor2.geometric_product(u_in_b).scale(0.5);
+        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
+        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
         motors_next[node_a] =
             motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
         motors_next[node_b] =
