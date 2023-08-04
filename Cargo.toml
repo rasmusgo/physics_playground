@@ -3,26 +3,6 @@ name = "physics_playground"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "xpbd_rigid_bodies"
-path = "src/xpbd_rigid_bodies.rs"
-
-[[bin]]
-name = "xpbd_particles"
-path = "src/xpbd_particles.rs"
-
-# [[bin]]
-# name = "ga_g3"
-# path = "src/ga_g3.rs"
-
-[[bin]]
-name = "ga_ppga3d"
-path = "src/ga_ppga3d.rs"
-
-[[bin]]
-name = "ga_ganja"
-path = "src/ga_ganja.rs"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

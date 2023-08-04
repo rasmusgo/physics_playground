@@ -1,10 +1,8 @@
-mod puffin_utils;
-
 use std::ops::{Add, Mul};
 
 use geometric_algebra::simd::Simd32x3;
 use geometric_algebra::*;
-use puffin_utils::start_puffin_server;
+use physics_playground::start_puffin_server;
 use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 use rerun::{
     components::{Box3D, ColorRGBA, Point3D, Quaternion, Radius, Vec3D, ViewCoordinates},
@@ -712,7 +710,7 @@ fn test_resolve_compliant_spherical_constraints() {
     let mut rng = StdRng::seed_from_u64(5);
 
     let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
-    let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
+    let inertia_map = InertiaMap::new(1.0, vec3(0.01, 0.01, 0.01));
     let dt = 0.001;
     let compliant_spherical_constraints = vec![CompliantSphericalConstraint {
         node_a: 0,
