@@ -1,35 +1,28 @@
+mod conversions;
+mod fixed_angle_constraint;
+mod inertia_map;
+mod logging;
+mod spherical_constraint;
+
 use std::ops::{Add, Mul};
 
-use geometric_algebra::simd::Simd32x3;
+use fixed_angle_constraint::CompliantFixedAngleConstraint;
 use geometric_algebra::*;
+use inertia_map::InertiaMap;
 use physics_playground::start_puffin_server;
 use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
 use rerun::{
-    components::{Box3D, ColorRGBA, Point3D, Quaternion, Radius, Vec3D, ViewCoordinates},
+    components::{Box3D, ColorRGBA, Point3D, Radius, ViewCoordinates},
     coordinates::{Handedness, SignedAxis3},
     external::glam::{self, vec3, Quat, Vec3},
-    time::{Time, TimeType, Timeline},
+    time::{TimeType, Timeline},
     MsgSender, RecordingStreamBuilder,
 };
 
-pub struct CompliantFixedAngleConstraint {
-    pub node_a: usize,
-    pub node_b: usize,
-    pub point_in_a: Vec3,
-    pub point_in_b: Vec3,
-    pub b_in_a: Quat,
-    pub positional_compliance: f32,
-    pub angular_compliance: f32,
-}
-
-pub struct CompliantSphericalConstraint {
-    pub node_a: usize,
-    pub node_b: usize,
-    pub point_in_a: Vec3,
-    pub point_in_b: Vec3,
-    pub positional_compliance: f32,
-}
-
+use crate::{
+    conversions::ToGlam, fixed_angle_constraint::resolve_compliant_fixed_angle_constraints,
+    logging::log_with_rerun,
+};
 enum ContactState {
     New,
     Sticking,
@@ -173,75 +166,7 @@ fn create_constraints(
     constraints
 }
 
-struct InertiaMap {
-    pub mass: Simd32x3,
-    pub inertia: Simd32x3,
-}
-
-impl InertiaMap {
-    fn new(mass: f32, inertia: Vec3) -> Self {
-        Self {
-            mass: Simd32x3::from([mass, mass, mass]),
-            inertia: Simd32x3::from(inertia.to_array()),
-        }
-    }
-
-    fn rate_to_momentum(&self, line: ppga3d::Line) -> ppga3d::Line {
-        ppga3d::Line::from_groups(line.group1() * self.inertia, line.group0() * self.mass)
-    }
-
-    fn momentum_to_rate(&self, line: ppga3d::Line) -> ppga3d::Line {
-        ppga3d::Line::from_groups(line.group1() / self.mass, line.group0() / self.inertia)
-    }
-}
-
-trait ToGlam {
-    type Output;
-    fn to_glam(&self) -> Self::Output;
-}
-
-impl ToGlam for ppga3d::Point {
-    type Output = glam::Vec3;
-    fn to_glam(&self) -> glam::Vec3 {
-        let g = self.group0();
-        glam::Vec3::new(g[1], g[2], g[3]) / g[0]
-    }
-}
-
-trait ToPpgaPoint {
-    type Output;
-    fn to_ppga_point(&self) -> Self::Output;
-}
-
-impl ToPpgaPoint for glam::Vec3 {
-    type Output = ppga3d::Point;
-    fn to_ppga_point(&self) -> ppga3d::Point {
-        ppga3d::Point::new(1.0, self.x, self.y, self.z)
-    }
-}
-
-trait ToPpgaTranslator {
-    type Output;
-    fn to_ppga_translator(&self) -> Self::Output;
-}
-
-impl ToPpgaTranslator for glam::Vec3 {
-    type Output = ppga3d::Translator;
-    fn to_ppga_translator(&self) -> ppga3d::Translator {
-        ppga3d::Translator::new(1.0, self.x * -0.5, self.y * -0.5, self.z * -0.5)
-    }
-}
-
 const ORIGIN: ppga3d::Point = ppga3d::Point::new(1.0, 0.0, 0.0, 0.0);
-
-#[test]
-fn glam_vec_as_translator() {
-    let v = vec3(1.0, 2.0, 3.0);
-    let t = v.to_ppga_translator();
-    let p = t.transformation(ORIGIN);
-    let p = p.to_glam();
-    assert_eq!(p, v);
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     start_puffin_server();
@@ -409,58 +334,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn log_with_rerun(
-    motors_curr: &[ppga3d::Motor],
-    active_collisions: &[Option<Contact>],
-    stable_time: Timeline,
-    time: f32,
-    colors: &[ColorRGBA],
-    boxes: &[Box3D],
-    recording: &rerun::RecordingStream,
-) -> Result<(), Box<dyn std::error::Error>> {
-    puffin::profile_function!();
-    let positions = motors_curr
-        .iter()
-        .map(|m| m.transformation(ORIGIN).to_glam().into())
-        .collect::<Vec<Vec3D>>();
-    let rotations = motors_curr
-        .iter()
-        .map(|m| {
-            let g = m.group0();
-            Quaternion::new(g[1], g[2], g[3], -g[0])
-        })
-        .collect::<Vec<Quaternion>>();
-    let collisions = active_collisions
-        .iter()
-        .filter_map(|op| op.as_ref())
-        .map(|p| p.point.into())
-        .collect::<Vec<Point3D>>();
-    let collision_colors = active_collisions
-        .iter()
-        .filter_map(|op| op.as_ref())
-        .map(|p| match p.state {
-            ContactState::New => ColorRGBA::from_rgb(255, 0, 255),
-            ContactState::Sticking => ColorRGBA::from_rgb(255, 0, 0),
-            ContactState::Sliding => ColorRGBA::from_rgb(255, 255, 0),
-        })
-        .collect::<Vec<ColorRGBA>>();
-    MsgSender::new("world/boxes")
-        .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
-        .with_component(&positions)?
-        .with_component(&rotations)?
-        .with_component(colors)?
-        // .with_splat(radius)?
-        .with_component(boxes)?
-        .send(recording)?;
-    MsgSender::new("world/collisions")
-        .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
-        .with_component(&collisions)?
-        .with_component(&collision_colors)?
-        .with_splat(Radius(0.03))?
-        .send(recording)?;
-    Ok(())
-}
-
 fn resolve_collisions(
     motors_next: &mut [ppga3d::Motor],
     active_collisions: &mut [Option<Contact>],
@@ -534,242 +407,5 @@ fn resolve_collisions(
         // }
         let t = -0.5 * (p - m.transformation(ORIGIN).to_glam());
         *m = ppga3d::Translator::new(1.0, t.x, t.y, t.z).geometric_product(*m);
-    }
-}
-
-#[inline(never)]
-fn resolve_compliant_fixed_angle_constraints(
-    compliant_fixed_angle_constraints: &[CompliantFixedAngleConstraint],
-    motors_next: &mut [ppga3d::Motor],
-    inertia_map: &InertiaMap,
-    dt: f32,
-) {
-    puffin::profile_function!();
-    for constraint in compliant_fixed_angle_constraints {
-        let node_a = constraint.node_a;
-        let node_b = constraint.node_b;
-        let world_from_a = motors_next[node_a];
-        let world_from_b = motors_next[node_b];
-        let a_from_anchor_a = constraint.point_in_a.to_ppga_translator();
-        let b_from_anchor_b = constraint.point_in_b.to_ppga_translator();
-        let world_from_anchor_a = world_from_a.geometric_product(a_from_anchor_a);
-        let world_from_anchor_b = world_from_b.geometric_product(b_from_anchor_b);
-        let anchor_a_from_anchor_b = world_from_anchor_a
-            .reversal()
-            .geometric_product(world_from_anchor_b);
-        let meet_line_in_anchor_a = anchor_a_from_anchor_b.ln();
-        let join_line_in_anchor_a = meet_line_in_anchor_a.dual();
-        let c: f32 = join_line_in_anchor_a.magnitude().into();
-        if c == 0.0 {
-            continue;
-        }
-        let n_in_anchor_a = join_line_in_anchor_a.scale(1.0 / c);
-        let b_from_anchor_a = b_from_anchor_b.geometric_product(anchor_a_from_anchor_b.reversal());
-        let a_from_anchor_a = ppga3d::Motor::one().geometric_product(a_from_anchor_a);
-        let n_in_a = a_from_anchor_a.transformation(n_in_anchor_a);
-        let n_in_b = b_from_anchor_a.transformation(n_in_anchor_a);
-        let s_in_a = inertia_map.momentum_to_rate(n_in_a);
-        let s_in_b = inertia_map.momentum_to_rate(n_in_b);
-        let w1: f32 = s_in_a.regressive_product(n_in_a).into();
-        let w2: f32 = s_in_b.regressive_product(n_in_b).into();
-        let correction = c / (w1 + w2 + constraint.angular_compliance / (dt * dt));
-        let u_in_a = s_in_a.scale(-correction);
-        let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
-        motors_next[node_a] =
-            motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
-        motors_next[node_b] =
-            motors_next[node_b].geometric_quotient(motors_next[node_b].magnitude());
-    }
-}
-
-#[test]
-fn test_resolve_compliant_fixed_angle_constraints() {
-    let recording =
-        RecordingStreamBuilder::new("XPBD test_resolve_compliant_fixed_angle_constraints")
-            .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
-            .unwrap();
-    let stable_time = Timeline::new("stable_time", TimeType::Time);
-    let mut rng = StdRng::seed_from_u64(5);
-
-    let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
-    let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
-    let dt = 0.001;
-    let compliant_fixed_angle_constraints = vec![CompliantFixedAngleConstraint {
-        node_a: 0,
-        node_b: 1,
-        point_in_a: glam::Vec3::new(0.1, 0.0, 0.05),
-        point_in_b: glam::Vec3::new(-0.1, 0.0, 0.05),
-        b_in_a: glam::Quat::IDENTITY,
-        positional_compliance: 0.0,
-        angular_compliance: 0.0,
-    }];
-
-    let colors = motors_next
-        .iter()
-        .map(|_| {
-            ColorRGBA::from_rgb(
-                rng.gen::<u8>() / 2 + 64,
-                rng.gen::<u8>() / 2 + 64,
-                rng.gen::<u8>() / 2 + 64,
-            )
-        })
-        .collect::<Vec<_>>();
-
-    let boxes = vec![
-        Box3D {
-            x: 0.1,
-            y: 0.1,
-            z: 0.1,
-        };
-        motors_next.len()
-    ];
-
-    log_with_rerun(
-        &motors_next,
-        &[],
-        stable_time,
-        0.0,
-        &colors,
-        &boxes,
-        &recording,
-    )
-    .unwrap();
-
-    for i in 1..=10 {
-        let time = i as f32 * dt;
-
-        resolve_compliant_fixed_angle_constraints(
-            &compliant_fixed_angle_constraints,
-            &mut motors_next,
-            &inertia_map,
-            dt,
-        );
-
-        log_with_rerun(
-            &motors_next,
-            &[],
-            stable_time,
-            time,
-            &colors,
-            &boxes,
-            &recording,
-        )
-        .unwrap();
-    }
-}
-
-#[inline(never)]
-fn resolve_compliant_spherical_constraints(
-    compliant_spherical_constraints: &[CompliantSphericalConstraint],
-    motors_next: &mut [ppga3d::Motor],
-    inertia_map: &InertiaMap,
-    dt: f32,
-) {
-    puffin::profile_function!();
-    for constraint in compliant_spherical_constraints {
-        let node_a = constraint.node_a;
-        let node_b = constraint.node_b;
-        let world_from_a = motors_next[node_a];
-        let world_from_b = motors_next[node_b];
-        let a_from_b = world_from_a.reversal().geometric_product(world_from_b);
-        let point_a_in_a = constraint.point_in_a.to_ppga_point();
-        let point_b_in_b = constraint.point_in_b.to_ppga_point();
-        let point_b_in_a = a_from_b.transformation(point_b_in_b);
-        let join_line_in_a = point_b_in_a.regressive_product(point_a_in_a);
-        let c: f32 = join_line_in_a.magnitude().into();
-        if c == 0.0 {
-            continue;
-        }
-        let n_in_a = join_line_in_a.scale(1.0 / c);
-        let n_in_b = a_from_b.reversal().transformation(n_in_a);
-        let s_in_a = inertia_map.momentum_to_rate(n_in_a);
-        let s_in_b = inertia_map.momentum_to_rate(n_in_b);
-        let w1: f32 = s_in_a.regressive_product(n_in_a).into();
-        let w2: f32 = s_in_b.regressive_product(n_in_b).into();
-        let correction = c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
-        let u_in_a = s_in_a.scale(-correction);
-        let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
-        motors_next[node_a] =
-            motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
-        motors_next[node_b] =
-            motors_next[node_b].geometric_quotient(motors_next[node_b].magnitude());
-    }
-}
-
-#[test]
-fn test_resolve_compliant_spherical_constraints() {
-    let recording =
-        RecordingStreamBuilder::new("XPBD test_resolve_compliant_spherical_constraints")
-            .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
-            .unwrap();
-    let stable_time = Timeline::new("stable_time", TimeType::Time);
-    let mut rng = StdRng::seed_from_u64(5);
-
-    let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
-    let inertia_map = InertiaMap::new(1.0, vec3(0.01, 0.01, 0.01));
-    let dt = 0.001;
-    let compliant_spherical_constraints = vec![CompliantSphericalConstraint {
-        node_a: 0,
-        node_b: 1,
-        point_in_a: glam::Vec3::new(0.1, 0.0, 0.1),
-        point_in_b: glam::Vec3::new(-0.1, 0.0, 0.1),
-        positional_compliance: 0.0,
-    }];
-
-    let colors = motors_next
-        .iter()
-        .map(|_| {
-            ColorRGBA::from_rgb(
-                rng.gen::<u8>() / 2 + 64,
-                rng.gen::<u8>() / 2 + 64,
-                rng.gen::<u8>() / 2 + 64,
-            )
-        })
-        .collect::<Vec<_>>();
-
-    let boxes = vec![
-        Box3D {
-            x: 0.1,
-            y: 0.1,
-            z: 0.1,
-        };
-        motors_next.len()
-    ];
-
-    log_with_rerun(
-        &motors_next,
-        &[],
-        stable_time,
-        0.0,
-        &colors,
-        &boxes,
-        &recording,
-    )
-    .unwrap();
-
-    for i in 1..5 {
-        let time = i as f32 * dt;
-
-        resolve_compliant_spherical_constraints(
-            &compliant_spherical_constraints,
-            &mut motors_next,
-            &inertia_map,
-            dt,
-        );
-
-        log_with_rerun(
-            &motors_next,
-            &[],
-            stable_time,
-            time,
-            &colors,
-            &boxes,
-            &recording,
-        )
-        .unwrap();
     }
 }
