@@ -34,7 +34,16 @@ pub fn resolve_compliant_fixed_angle_constraints(
             .geometric_product(world_from_anchor_b);
         let meet_line_in_anchor_a = anchor_a_from_anchor_b.ln();
         let join_line_in_anchor_a = meet_line_in_anchor_a.dual();
-        let c: f32 = join_line_in_anchor_a.magnitude().into();
+        let c: f32 = (
+            join_line_in_anchor_a[0] * join_line_in_anchor_a[0]
+                + join_line_in_anchor_a[1] * join_line_in_anchor_a[1]
+                + join_line_in_anchor_a[2] * join_line_in_anchor_a[2]
+                + join_line_in_anchor_a[3] * join_line_in_anchor_a[3]
+                + join_line_in_anchor_a[4] * join_line_in_anchor_a[4]
+                + join_line_in_anchor_a[5] * join_line_in_anchor_a[5]
+            //
+        )
+        .sqrt();
         if c == 0.0 {
             continue;
         }
@@ -50,8 +59,8 @@ pub fn resolve_compliant_fixed_angle_constraints(
         let correction = c / (w1 + w2 + constraint.angular_compliance / (dt * dt));
         let u_in_a = s_in_a.scale(-correction);
         let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
+        motors_next[node_a] -= world_from_a.geometric_product(u_in_a);
+        motors_next[node_b] -= world_from_b.geometric_product(u_in_b);
         motors_next[node_a] =
             motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
         motors_next[node_b] =
