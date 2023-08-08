@@ -74,18 +74,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_resolve_compliant_fixed_angle_constraints() {
-        let recording =
-            RecordingStreamBuilder::new("XPBD test_resolve_compliant_fixed_angle_constraints")
-                .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
-                .unwrap();
-        let stable_time = Timeline::new("stable_time", TimeType::Time);
-        let mut rng = StdRng::seed_from_u64(5);
-
+    fn test_resolve_compliant_fixed_angle_constraints_1() {
         let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
         let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
         let dt = 0.001;
-        let compliant_fixed_angle_constraints = vec![CompliantFixedAngleConstraint {
+        let compliant_fixed_angle_constraints = [CompliantFixedAngleConstraint {
             node_a: 0,
             node_b: 1,
             point_in_a: glam::Vec3::new(0.1, 0.0, 0.05),
@@ -94,6 +87,27 @@ mod tests {
             positional_compliance: 0.0,
             angular_compliance: 0.0,
         }];
+
+        test_resolve_compliant_fixed_angle_constraints(
+            &mut motors_next,
+            dt,
+            &compliant_fixed_angle_constraints,
+            inertia_map,
+        );
+    }
+
+    fn test_resolve_compliant_fixed_angle_constraints(
+        motors_next: &mut [ppga3d::Motor],
+        dt: f32,
+        compliant_fixed_angle_constraints: &[CompliantFixedAngleConstraint],
+        inertia_map: InertiaMap,
+    ) {
+        let recording =
+            RecordingStreamBuilder::new("XPBD test_resolve_compliant_fixed_angle_constraints")
+                .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
+                .unwrap();
+        let stable_time = Timeline::new("stable_time", TimeType::Time);
+        let mut rng = StdRng::seed_from_u64(5);
 
         let colors = motors_next
             .iter()
@@ -131,7 +145,7 @@ mod tests {
 
             resolve_compliant_fixed_angle_constraints(
                 &compliant_fixed_angle_constraints,
-                &mut motors_next,
+                motors_next,
                 &inertia_map,
                 dt,
             );
