@@ -81,6 +81,29 @@ mod tests {
         let compliant_fixed_angle_constraints = [CompliantFixedAngleConstraint {
             node_a: 0,
             node_b: 1,
+            point_in_a: glam::Vec3::new(0.1, 0.0, 0.0),
+            point_in_b: glam::Vec3::new(-0.1, 0.0, 0.0),
+            b_in_a: glam::Quat::IDENTITY,
+            positional_compliance: 0.0,
+            angular_compliance: 0.0,
+        }];
+
+        test_resolve_compliant_fixed_angle_constraints(
+            &mut motors_next,
+            dt,
+            &compliant_fixed_angle_constraints,
+            inertia_map,
+        );
+    }
+
+    #[test]
+    fn test_resolve_compliant_fixed_angle_constraints_2() {
+        let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
+        let inertia_map = InertiaMap::new(1.0, vec3(0.1, 0.1, 0.1));
+        let dt = 0.001;
+        let compliant_fixed_angle_constraints = [CompliantFixedAngleConstraint {
+            node_a: 0,
+            node_b: 1,
             point_in_a: glam::Vec3::new(0.1, 0.0, 0.05),
             point_in_b: glam::Vec3::new(-0.1, 0.0, 0.05),
             b_in_a: glam::Quat::IDENTITY,
