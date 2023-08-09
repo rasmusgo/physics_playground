@@ -40,10 +40,18 @@ pub fn resolve_compliant_spherical_constraints(
         let w1: f32 = s_in_a.regressive_product(n_in_a).into();
         let w2: f32 = s_in_b.regressive_product(n_in_b).into();
         let correction = c / (w1 + w2 + constraint.positional_compliance / (dt * dt));
-        let u_in_a = s_in_a.scale(-correction);
-        let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= world_from_a.geometric_product(u_in_a).scale(0.5);
-        motors_next[node_b] -= world_from_b.geometric_product(u_in_b).scale(0.5);
+        let u_in_a = s_in_a.scale(0.5 * correction);
+        let u_in_b = s_in_b.scale(-0.5 * correction);
+        motors_next[node_a] = world_from_a
+            .geometric_product(ppga3d::Translator::new(
+                1.0, u_in_a[0], u_in_a[1], u_in_a[2],
+            ))
+            .geometric_product(ppga3d::Rotor::new(1.0, u_in_a[3], u_in_a[4], u_in_a[5]));
+        motors_next[node_b] = world_from_b
+            .geometric_product(ppga3d::Translator::new(
+                1.0, u_in_b[0], u_in_b[1], u_in_b[2],
+            ))
+            .geometric_product(ppga3d::Rotor::new(1.0, u_in_b[3], u_in_b[4], u_in_b[5]));
         motors_next[node_a] =
             motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
         motors_next[node_b] =
@@ -66,14 +74,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_resolve_compliant_spherical_constraints() {
-        let recording =
-            RecordingStreamBuilder::new("XPBD test_resolve_compliant_spherical_constraints")
-                .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
-                .unwrap();
-        let stable_time = Timeline::new("stable_time", TimeType::Time);
-        let mut rng = StdRng::seed_from_u64(5);
+    fn test_resolve_compliant_spherical_constraints_1() {
+        let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
+        let inertia_map = InertiaMap::new(1.0, vec3(0.01, 0.01, 0.01));
+        let dt = 0.001;
+        let compliant_spherical_constraints = vec![CompliantSphericalConstraint {
+            node_a: 0,
+            node_b: 1,
+            point_in_a: glam::Vec3::new(0.1, 0.0, 0.0),
+            point_in_b: glam::Vec3::new(-0.1, 0.0, 0.0),
+            positional_compliance: 0.0,
+        }];
 
+        test_resolve_compliant_spherical_constraints(
+            &mut motors_next,
+            dt,
+            compliant_spherical_constraints,
+            inertia_map,
+        );
+    }
+
+    #[test]
+    fn test_resolve_compliant_spherical_constraints_2() {
         let mut motors_next = [ppga3d::Motor::one(), ppga3d::Motor::one()];
         let inertia_map = InertiaMap::new(1.0, vec3(0.01, 0.01, 0.01));
         let dt = 0.001;
@@ -84,6 +106,27 @@ mod tests {
             point_in_b: glam::Vec3::new(-0.1, 0.0, 0.1),
             positional_compliance: 0.0,
         }];
+
+        test_resolve_compliant_spherical_constraints(
+            &mut motors_next,
+            dt,
+            compliant_spherical_constraints,
+            inertia_map,
+        );
+    }
+
+    fn test_resolve_compliant_spherical_constraints(
+        motors_next: &mut [ppga3d::Motor],
+        dt: f32,
+        compliant_spherical_constraints: Vec<CompliantSphericalConstraint>,
+        inertia_map: InertiaMap,
+    ) {
+        let recording =
+            RecordingStreamBuilder::new("XPBD test_resolve_compliant_spherical_constraints")
+                .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
+                .unwrap();
+        let stable_time = Timeline::new("stable_time", TimeType::Time);
+        let mut rng = StdRng::seed_from_u64(5);
 
         let colors = motors_next
             .iter()
@@ -121,7 +164,7 @@ mod tests {
 
             resolve_compliant_spherical_constraints(
                 &compliant_spherical_constraints,
-                &mut motors_next,
+                motors_next,
                 &inertia_map,
                 dt,
             );
