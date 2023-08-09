@@ -57,10 +57,18 @@ pub fn resolve_compliant_fixed_angle_constraints(
         let w1: f32 = s_in_a.regressive_product(n_in_a).into();
         let w2: f32 = s_in_b.regressive_product(n_in_b).into();
         let correction = c / (w1 + w2 + constraint.angular_compliance / (dt * dt));
-        let u_in_a = s_in_a.scale(-correction);
-        let u_in_b = s_in_b.scale(correction);
-        motors_next[node_a] -= world_from_a.geometric_product(u_in_a);
-        motors_next[node_b] -= world_from_b.geometric_product(u_in_b);
+        let u_in_a = s_in_a.scale(correction);
+        let u_in_b = s_in_b.scale(-correction);
+        motors_next[node_a] = world_from_a
+            .geometric_product(ppga3d::Translator::new(
+                1.0, u_in_a[0], u_in_a[1], u_in_a[2],
+            ))
+            .geometric_product(ppga3d::Rotor::new(1.0, u_in_a[3], u_in_a[4], u_in_a[5]));
+        motors_next[node_b] = world_from_b
+            .geometric_product(ppga3d::Translator::new(
+                1.0, u_in_b[0], u_in_b[1], u_in_b[2],
+            ))
+            .geometric_product(ppga3d::Rotor::new(1.0, u_in_b[3], u_in_b[4], u_in_b[5]));
         motors_next[node_a] =
             motors_next[node_a].geometric_quotient(motors_next[node_a].magnitude());
         motors_next[node_b] =
