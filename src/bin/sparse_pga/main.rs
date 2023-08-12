@@ -1,3 +1,6 @@
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+
 mod coefficient;
 mod elements;
 mod multivector;
