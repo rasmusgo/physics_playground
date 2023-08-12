@@ -51,8 +51,7 @@ pub struct One {}
 #[derive(Default)]
 pub struct MinusOne {}
 
-#[derive(Default)]
-pub struct Float(pub float_t);
+type Float = f64;
 
 // 0 + x = x
 impl<T> Add<T> for Zero {
@@ -109,7 +108,7 @@ impl Add<One> for One {
     type Output = Float;
 
     fn add(self, _rhs: One) -> Float {
-        Float(2.0)
+        2.0
     }
 }
 
@@ -118,7 +117,7 @@ impl Add<MinusOne> for MinusOne {
     type Output = Float;
 
     fn add(self, _rhs: MinusOne) -> Float {
-        Float(-2.0)
+        -2.0
     }
 }
 
@@ -127,7 +126,7 @@ impl Add<Float> for One {
     type Output = Float;
 
     fn add(self, rhs: Float) -> Float {
-        Float(1.0 + rhs.0)
+        1.0 + rhs
     }
 }
 
@@ -136,7 +135,7 @@ impl Add<One> for Float {
     type Output = Float;
 
     fn add(self, _rhs: One) -> Float {
-        Float(self.0 + 1.0)
+        self + 1.0
     }
 }
 
@@ -145,7 +144,7 @@ impl Add<Float> for MinusOne {
     type Output = Float;
 
     fn add(self, rhs: Float) -> Float {
-        Float(-1.0 + rhs.0)
+        -1.0 + rhs
     }
 }
 
@@ -154,16 +153,7 @@ impl Add<MinusOne> for Float {
     type Output = Float;
 
     fn add(self, _rhs: MinusOne) -> Float {
-        Float(self.0 + -1.0)
-    }
-}
-
-// x + y
-impl Add<Float> for Float {
-    type Output = Float;
-
-    fn add(self, rhs: Float) -> Float {
-        Float(self.0 + rhs.0)
+        self + -1.0
     }
 }
 
@@ -178,30 +168,30 @@ fn test_add() {
     let _foo: MinusOne = Zero {} + MinusOne {};
 
     let foo: Float = MinusOne {} + MinusOne {};
-    assert_eq!(foo.0, -2.0);
+    assert_eq!(foo, -2.0);
 
     let foo: Float = One {} + One {};
-    assert_eq!(foo.0, 2.0);
+    assert_eq!(foo, 2.0);
 }
 
 #[test]
 fn test_add_multivector() {
     let motor = UnitMotor {
-        e01: Float(0.0),
-        e02: Float(0.0),
-        e03: Float(0.0),
-        e12: Float(0.0),
-        e31: Float(0.0),
-        e23: Float(0.0),
+        e01: 0.0,
+        e02: 0.0,
+        e03: 0.0,
+        e12: 0.0,
+        e31: 0.0,
+        e23: 0.0,
         ..Default::default()
     };
     let line = Line {
-        e01: Float(0.0),
-        e02: Float(0.0),
-        e03: Float(0.0),
-        e12: Float(0.0),
-        e31: Float(0.0),
-        e23: Float(0.0),
+        e01: 0.0,
+        e02: 0.0,
+        e03: 0.0,
+        e12: 0.0,
+        e31: 0.0,
+        e23: 0.0,
         ..Default::default()
     };
     let result: UnitMotor = motor + line;
