@@ -152,3 +152,27 @@ fn test_mul_motor_line() {
     };
     let result: Motor = motor * line;
 }
+
+#[test]
+fn test_transform_line() {
+    let motor = Motor {
+        one: 1.0,
+        e01: 0.0,
+        e02: 0.0,
+        e03: 0.0,
+        e12: 0.0,
+        e31: 0.0,
+        e23: 0.0,
+        ..Default::default()
+    };
+    let line = Line {
+        e01: 0.0,
+        e02: 0.0,
+        e03: 0.0,
+        e12: 0.0,
+        e31: 0.0,
+        e23: 0.0,
+        ..Default::default()
+    };
+    let result: Motor = motor.clone() * line * motor.reverse();
+}

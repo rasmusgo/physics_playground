@@ -440,6 +440,105 @@ where
     }
 }
 
+pub trait Reverse {
+    type Output;
+    fn reverse(self) -> Self::Output;
+}
+
+impl<
+        T_one,
+        T_e0,
+        T_e1,
+        T_e2,
+        T_e3,
+        T_e01,
+        T_e02,
+        T_e03,
+        T_e12,
+        T_e31,
+        T_e23,
+        T_e021,
+        T_e013,
+        T_e032,
+        T_e123,
+        T_e0123,
+    > Reverse
+    for MultiVector<
+        T_one,
+        T_e0,
+        T_e1,
+        T_e2,
+        T_e3,
+        T_e01,
+        T_e02,
+        T_e03,
+        T_e12,
+        T_e31,
+        T_e23,
+        T_e021,
+        T_e013,
+        T_e032,
+        T_e123,
+        T_e0123,
+    >
+where
+    T_one: Neg,
+    T_e0: Neg,
+    T_e1: Neg,
+    T_e2: Neg,
+    T_e3: Neg,
+    T_e01: Neg,
+    T_e02: Neg,
+    T_e03: Neg,
+    T_e12: Neg,
+    T_e31: Neg,
+    T_e23: Neg,
+    T_e021: Neg,
+    T_e013: Neg,
+    T_e032: Neg,
+    T_e123: Neg,
+    T_e0123: Neg,
+{
+    type Output = MultiVector<
+        T_one,
+        T_e0,
+        T_e1,
+        T_e2,
+        T_e3,
+        <T_e01 as Neg>::Output,
+        <T_e02 as Neg>::Output,
+        <T_e03 as Neg>::Output,
+        <T_e12 as Neg>::Output,
+        <T_e31 as Neg>::Output,
+        <T_e23 as Neg>::Output,
+        <T_e021 as Neg>::Output,
+        <T_e013 as Neg>::Output,
+        <T_e032 as Neg>::Output,
+        <T_e123 as Neg>::Output,
+        T_e0123,
+    >;
+    fn reverse(self) -> Self::Output {
+        Self::Output {
+            one: self.one,
+            e0: self.e0,
+            e1: self.e1,
+            e2: self.e2,
+            e3: self.e3,
+            e01: -self.e01,
+            e02: -self.e02,
+            e03: -self.e03,
+            e12: -self.e12,
+            e31: -self.e31,
+            e23: -self.e23,
+            e021: -self.e021,
+            e013: -self.e013,
+            e032: -self.e032,
+            e123: -self.e123,
+            e0123: self.e0123,
+        }
+    }
+}
+
 impl<
         L_one,
         L_e0,
@@ -2362,6 +2461,46 @@ fn test_add_neg_multivector() {
     >::default();
     let result = a + -b;
     let _: Const<0> = result.one;
+}
+
+#[test]
+fn test_reverse() {
+    let a = MultiVector::<
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+        One,
+    >::default();
+    let result: MultiVector<
+        One,
+        One,
+        One,
+        One,
+        One,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        MinusOne,
+        One,
+    > = a.reverse();
 }
 
 #[test]
