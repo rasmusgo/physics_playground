@@ -1,8 +1,10 @@
-mod sparse_pga;
+mod coefficient;
+mod elements;
+mod multivector;
 
 fn main() {
-    let p = sparse_pga::Point::default();
-    let m = sparse_pga::Line::default();
+    let p = elements::Point::default();
+    let m = elements::Line::default();
     let r = p + m;
     println!("{r:?}");
 }
