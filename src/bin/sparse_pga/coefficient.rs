@@ -3,7 +3,7 @@
 
 use std::ops::{Add, BitAnd, BitOr, BitXor, Index, IndexMut, Mul, Neg, Not, Sub};
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default)]
 pub struct Const<const N: i32> {}
 
 impl<const N: i32> std::fmt::Debug for Const<N> {
@@ -250,6 +250,28 @@ where
         Self::Output {}
     }
 }
+impl<const N: i32> Mul<Float> for Const<N>
+where
+    Assert<{ N != 0 }>: IsTrue,
+{
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Float) -> Float {
+        N as Float * rhs
+    }
+}
+impl<const N: i32> Mul<Const<N>> for Float
+where
+    Assert<{ N != 0 }>: IsTrue,
+{
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Const<N>) -> Float {
+        rhs * N as Float
+    }
+}
 
 #[test]
 fn test_add() {
@@ -288,4 +310,8 @@ fn test_mul() {
     let _foo: Zero = Zero {} * MinusOne {};
     let _foo: One = MinusOne {} * MinusOne {};
     let _foo: One = One {} * One {};
+    let _foo: Zero = Zero {} * 1.2;
+    let _foo: Zero = 1.2 * Zero {};
+    let _foo: Float = One {} * 1.2;
+    let _foo: Float = 1.2 * One {};
 }
