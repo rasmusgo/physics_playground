@@ -180,6 +180,7 @@ where
 {
     type Output = Const<{ -N }>;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Self::Output {}
     }
