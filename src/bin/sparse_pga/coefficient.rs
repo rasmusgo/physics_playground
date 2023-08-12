@@ -3,8 +3,14 @@
 
 use std::ops::{Add, BitAnd, BitOr, BitXor, Index, IndexMut, Mul, Neg, Not, Sub};
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct Const<const N: i32> {}
+
+impl<const N: i32> std::fmt::Debug for Const<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        N.fmt(f)
+    }
+}
 
 pub type Zero = Const<0>;
 pub type One = Const<1>;
