@@ -481,3 +481,45 @@ fn test_sub_multivector() {
     let result = a - b;
     let _: Const<0> = result.one;
 }
+
+#[test]
+fn test_add_neg_multivector() {
+    let a = MultiVector::<
+        One,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+        f64,
+        f64,
+        f64,
+        f64,
+        f64,
+        f64,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+    >::default();
+    let b = MultiVector::<
+        One,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+        f64,
+        f64,
+        f64,
+        f64,
+        f64,
+        f64,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+        Zero,
+    >::default();
+    let result = a + -b;
+    let _: Const<0> = result.one;
+}
