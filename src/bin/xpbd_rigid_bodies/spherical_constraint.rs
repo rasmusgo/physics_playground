@@ -62,12 +62,7 @@ pub fn resolve_compliant_spherical_constraints(
 #[cfg(test)]
 mod tests {
     use rand::{rngs::StdRng, Rng, SeedableRng};
-    use rerun::{
-        components::{Box3D, ColorRGBA},
-        external::glam::{self, vec3},
-        time::{TimeType, Timeline},
-        RecordingStreamBuilder,
-    };
+    use rerun::external::glam::{self, vec3};
 
     use crate::logging::log_with_rerun;
 
@@ -122,16 +117,15 @@ mod tests {
         inertia_map: InertiaMap,
     ) {
         let recording =
-            RecordingStreamBuilder::new("XPBD test_resolve_compliant_spherical_constraints")
-                .connect(rerun::default_server_addr(), rerun::default_flush_timeout())
+            rerun::RecordingStreamBuilder::new("XPBD test_resolve_compliant_spherical_constraints")
+                .connect()
                 .unwrap();
-        let stable_time = Timeline::new("stable_time", TimeType::Time);
         let mut rng = StdRng::seed_from_u64(5);
 
         let colors = motors_next
             .iter()
             .map(|_| {
-                ColorRGBA::from_rgb(
+                rerun::Color::from_rgb(
                     rng.gen::<u8>() / 2 + 64,
                     rng.gen::<u8>() / 2 + 64,
                     rng.gen::<u8>() / 2 + 64,
@@ -139,25 +133,9 @@ mod tests {
             })
             .collect::<Vec<_>>();
 
-        let boxes = vec![
-            Box3D {
-                x: 0.1,
-                y: 0.1,
-                z: 0.1,
-            };
-            motors_next.len()
-        ];
+        let boxes = vec![[0.1, 0.1, 0.1,]; motors_next.len()];
 
-        log_with_rerun(
-            &motors_next,
-            &[],
-            stable_time,
-            0.0,
-            &colors,
-            &boxes,
-            &recording,
-        )
-        .unwrap();
+        log_with_rerun(&motors_next, &[], 0.0, &colors, &boxes, &recording).unwrap();
 
         for i in 1..5 {
             let time = i as f32 * dt;
@@ -169,16 +147,7 @@ mod tests {
                 dt,
             );
 
-            log_with_rerun(
-                &motors_next,
-                &[],
-                stable_time,
-                time,
-                &colors,
-                &boxes,
-                &recording,
-            )
-            .unwrap();
+            log_with_rerun(&motors_next, &[], time, &colors, &boxes, &recording).unwrap();
         }
     }
 }

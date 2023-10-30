@@ -2,13 +2,7 @@ use std::ops::{Add, Mul};
 
 use nalgebra::{Matrix3, Vector3};
 use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
-use rerun::{
-    components::{ColorRGBA, Point3D, Radius, ViewCoordinates},
-    coordinates::{Handedness, SignedAxis3},
-    external::glam::{self, vec3, Vec3},
-    time::{Time, TimeType, Timeline},
-    MsgSender, RecordingStreamBuilder,
-};
+use rerun::external::glam::{self, vec3, Vec3};
 
 struct ShapeConstraint(Vec<usize>, Vec<Vector3<f32>>, Matrix3<f32>);
 
@@ -115,10 +109,7 @@ fn create_shape_constraints(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let recording = RecordingStreamBuilder::new("XPBD particles")
-        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
-
-    let stable_time = Timeline::new("stable_time", TimeType::Time);
+    let recording = rerun::RecordingStreamBuilder::new("XPBD particles").connect()?;
 
     let nx = 10;
     let ny = 10;
@@ -135,34 +126,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut rng = StdRng::seed_from_u64(1188553);
     shape_constraints.shuffle(&mut rng);
 
-    let points = points_curr
-        .iter()
-        .map(|&p| Point3D::from(p))
-        .collect::<Vec<_>>();
-
-    let colors = points
+    let colors = points_curr
         .iter()
         .map(|_| {
-            ColorRGBA::from_rgb(
+            rerun::Color::from_rgb(
                 rng.gen::<u8>() / 2 + 64,
                 rng.gen::<u8>() / 2 + 64,
                 rng.gen::<u8>() / 2 + 64,
             )
         })
         .collect::<Vec<_>>();
-    let radius = Radius(0.025);
-    MsgSender::new("world")
-        .with_timeless(true)
-        .with_splat(ViewCoordinates::from_up_and_handedness(
-            SignedAxis3::POSITIVE_Z,
-            Handedness::Right,
-        ))?
-        .send(&recording)?;
-    MsgSender::new("world/points")
-        .with_component(&points)?
-        .with_component(&colors)?
-        .with_splat(radius)?
-        .send(&recording)?;
+    let radius = 0.025;
+    recording.log_timeless("world", &rerun::ViewCoordinates::RIGHT_HAND_Z_UP)?;
+
+    recording.log(
+        "world/points",
+        &rerun::Points3D::new(points_curr.clone())
+            .with_colors(colors.clone())
+            .with_radii([radius]),
+    )?;
 
     let inner_r = 1.0;
     let inner_r2 = inner_r * inner_r;
@@ -170,12 +152,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let outer_r2 = outer_r * outer_r;
     let stiction_factor = 0.25; // Maximum tangential correction per correction along normal.
     let shape_compliance = 0.0001; // Inverse physical stiffness
-    MsgSender::new("world/collider")
-        .with_timeless(true)
-        .with_component(&[Point3D::ZERO])?
-        .with_splat(ColorRGBA::from_rgb(100, 100, 100))?
-        .with_splat(Radius(inner_r))?
-        .send(&recording)?;
+    recording.log_timeless(
+        "world/collider",
+        &rerun::Points3D::new([[0.0, 0.0, 0.0]])
+            .with_colors([rerun::Color::from_rgb(100, 100, 100)])
+            .with_radii([inner_r]),
+    )?;
 
     let dt = 0.005;
     let acc = vec3(0.0, 0.0, -9.82);
@@ -296,36 +278,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         points_curr = points_next;
 
-        let points = points_curr
-            .iter()
-            .map(|&p| p.into())
-            .collect::<Vec<Point3D>>();
         let collisions = active_collisions
             .iter()
             .filter_map(|op| op.as_ref())
-            .map(|p| p.point.into())
-            .collect::<Vec<Point3D>>();
+            .map(|p| p.point)
+            .collect::<Vec<_>>();
         let collision_colors = active_collisions
             .iter()
             .filter_map(|op| op.as_ref())
             .map(|p| match p.state {
-                ContactState::New => ColorRGBA::from_rgb(255, 0, 255),
-                ContactState::Sticking => ColorRGBA::from_rgb(255, 0, 0),
-                ContactState::Sliding => ColorRGBA::from_rgb(255, 255, 0),
+                ContactState::New => rerun::Color::from_rgb(255, 0, 255),
+                ContactState::Sticking => rerun::Color::from_rgb(255, 0, 0),
+                ContactState::Sliding => rerun::Color::from_rgb(255, 255, 0),
             })
-            .collect::<Vec<ColorRGBA>>();
-        MsgSender::new("world/points")
-            .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
-            .with_component(&points)?
-            .with_component(&colors)?
-            .with_splat(radius)?
-            .send(&recording)?;
-        MsgSender::new("world/collisions")
-            .with_time(stable_time, Time::from_seconds_since_epoch(time as _))
-            .with_component(&collisions)?
-            .with_component(&collision_colors)?
-            .with_splat(Radius(0.03))?
-            .send(&recording)?;
+            .collect::<Vec<rerun::Color>>();
+        recording.set_time_seconds("stable_time", time as f64);
+        recording.log(
+            "world/points",
+            &rerun::Points3D::new(points_curr.clone())
+                .with_colors(colors.clone())
+                .with_radii([radius]),
+        )?;
+        recording.log(
+            "world/collisions",
+            &rerun::Points3D::new(collisions)
+                .with_colors(collision_colors)
+                .with_radii([0.03]),
+        )?;
     }
     Ok(())
 }

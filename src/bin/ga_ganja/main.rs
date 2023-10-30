@@ -2,26 +2,20 @@ use itertools::Itertools;
 mod pga3d;
 use pga3d::PGA3D;
 mod rr {
-    pub use rerun::{
-        components::{Arrow3D, ColorRGBA, Point3D, Radius, Vec3D, ViewCoordinates},
-        coordinates::{Handedness, SignedAxis3},
-        external::glam::{self, vec3, Vec3},
-        time::{Time, TimeType, Timeline},
-        MsgSender, RecordingStreamBuilder,
-    };
+    pub use rerun::external::glam::{self, vec3, Vec3};
 }
 
 trait IntoRerun<T> {
-    fn into_rerun(self) -> rr::Point3D;
-    fn into_rerun_vec(self) -> rr::Vec3D;
+    fn into_rerun(self) -> rerun::Position3D;
+    fn into_rerun_vec(self) -> rerun::Vec3D;
 }
 
 impl IntoRerun<PGA3D> for PGA3D {
-    fn into_rerun(self) -> rr::Point3D {
-        rr::Point3D::new(self[11] as _, self[12] as _, self[13] as _)
+    fn into_rerun(self) -> rerun::Position3D {
+        rerun::Position3D::new(self[11] as _, self[12] as _, self[13] as _)
     }
-    fn into_rerun_vec(self) -> rr::Vec3D {
-        rr::Vec3D::new(self[11] as _, self[12] as _, self[13] as _)
+    fn into_rerun_vec(self) -> rerun::Vec3D {
+        rerun::Vec3D::new(self[11] as _, self[12] as _, self[13] as _)
     }
 }
 
@@ -74,18 +68,10 @@ fn forques(state: &State) -> PGA3D {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let recording = rr::RecordingStreamBuilder::new("GA physics ganja")
-        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
-    let stable_time = rr::Timeline::new("stable_time", rr::TimeType::Time);
-    rr::MsgSender::new("world")
-        .with_timeless(true)
-        .with_splat(rr::ViewCoordinates::from_up_and_handedness(
-            rr::SignedAxis3::POSITIVE_Z,
-            rr::Handedness::Right,
-        ))?
-        .send(&recording)?;
+    let recording = rerun::RecordingStreamBuilder::new("GA physics ganja").connect()?;
+    recording.log_timeless("world", &rerun::ViewCoordinates::RIGHT_HAND_Z_UP)?;
 
-    let radius = rr::Radius(0.025);
+    let radius = 0.025;
 
     let points_in_local = [
         PGA3D::point(-0.5, -0.5, -0.5),
@@ -127,49 +113,43 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 (state.world_from_local.clone() * p_in_local * state.world_from_local.Reverse())
                     .into_rerun()
             })
-            .collect::<Vec<rr::Point3D>>();
-        let lines = edges
+            .collect::<Vec<_>>();
+        let (edge_origins, edge_vectors): (Vec<_>, Vec<_>) = edges
             .iter()
-            .map(|e| rr::Arrow3D {
-                origin: [points[e.i].x, points[e.i].y, points[e.i].z].into(),
-                vector: [
-                    points[e.j].x - points[e.i].x,
-                    points[e.j].y - points[e.i].y,
-                    points[e.j].z - points[e.i].z,
-                ]
-                .into(),
+            .map(|e| {
+                (
+                    points[e.i],
+                    (
+                        points[e.j][0] - points[e.i][0],
+                        points[e.j][1] - points[e.i][1],
+                        points[e.j][2] - points[e.i][2],
+                    ),
+                )
             })
-            .collect::<Vec<rr::Arrow3D>>();
+            .unzip();
         let anchor = ATTACH_ANCHOR.into_rerun();
         let point = (&state.world_from_local * ATTACH_IN_BODY * state.world_from_local.Reverse())
             .into_rerun();
-        let springs = vec![rr::Arrow3D {
-            origin: [anchor.x, anchor.y, anchor.z].into(),
-            vector: [point.x - anchor.x, point.y - anchor.y, point.z - anchor.z].into(),
-        }];
+        let origin = anchor;
+        let vector = rerun::Vector3D::from([
+            point[0] - anchor[0],
+            point[1] - anchor[1],
+            point[2] - anchor[2],
+        ]);
 
-        rr::MsgSender::new("world/points")
-            .with_time(
-                stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt),
-            )
-            .with_component(&points)?
-            .with_splat(radius)?
-            .send(&recording)?;
-        rr::MsgSender::new("world/lines")
-            .with_time(
-                stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt),
-            )
-            .with_component(&lines)?
-            .send(&recording)?;
-        rr::MsgSender::new("world/springs")
-            .with_time(
-                stable_time,
-                rr::Time::from_seconds_since_epoch(i as f64 * dt),
-            )
-            .with_component(&springs)?
-            .send(&recording)?;
+        recording.set_time_seconds("stable_time", i as f64 * dt);
+        recording.log(
+            "world/points",
+            &rerun::Points3D::new(points.clone()).with_radii([radius]),
+        )?;
+        recording.log(
+            "world/lines",
+            &rerun::Arrows3D::from_vectors(edge_vectors).with_origins(edge_origins),
+        )?;
+        recording.log(
+            "world/springs",
+            &rerun::Arrows3D::from_vectors([vector]).with_origins([origin]),
+        )?;
     }
 
     Ok(())

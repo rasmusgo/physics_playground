@@ -11,13 +11,7 @@ use geometric_algebra::*;
 use inertia_map::InertiaMap;
 use physics_playground::start_puffin_server;
 use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};
-use rerun::{
-    components::{Box3D, ColorRGBA, Point3D, Radius, ViewCoordinates},
-    coordinates::{Handedness, SignedAxis3},
-    external::glam::{self, vec3, Quat, Vec3},
-    time::{TimeType, Timeline},
-    MsgSender, RecordingStreamBuilder,
-};
+use rerun::external::glam::{self, vec3, Quat, Vec3};
 
 use crate::{
     conversions::ToGlam, fixed_angle_constraint::resolve_compliant_fixed_angle_constraints,
@@ -178,10 +172,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let angular_compliance = 0.001;
     let stiction_factor = 0.25; // Maximum tangential correction per correction along normal.
 
-    let recording = RecordingStreamBuilder::new("XPBD rigid bodies")
-        .connect(rerun::default_server_addr(), rerun::default_flush_timeout())?;
-
-    let stable_time = Timeline::new("stable_time", TimeType::Time);
+    let recording = rerun::RecordingStreamBuilder::new("XPBD rigid bodies").connect()?;
 
     let nx = 10;
     let ny = 10;
@@ -209,40 +200,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let colors = points
         .iter()
         .map(|_| {
-            ColorRGBA::from_rgb(
+            rerun::Color::from_rgb(
                 rng.gen::<u8>() / 2 + 64,
                 rng.gen::<u8>() / 2 + 64,
                 rng.gen::<u8>() / 2 + 64,
             )
         })
         .collect::<Vec<_>>();
-    MsgSender::new("world")
-        .with_timeless(true)
-        .with_splat(ViewCoordinates::from_up_and_handedness(
-            SignedAxis3::POSITIVE_Z,
-            Handedness::Right,
-        ))?
-        .send(&recording)?;
+    recording.log_timeless("world", &rerun::ViewCoordinates::RIGHT_HAND_Z_UP)?;
 
-    let boxes = vec![
-        Box3D {
-            x: 0.1,
-            y: 0.1,
-            z: 0.1,
-        };
-        points.len()
-    ];
+    let boxes = vec![[0.1, 0.1, 0.1,]; points.len()];
 
     let inner_r = 1.0;
     let inner_r2 = inner_r * inner_r;
     let outer_r = 5.0;
     let outer_r2 = outer_r * outer_r;
-    MsgSender::new("world/collider")
-        .with_timeless(true)
-        .with_component(&[Point3D::ZERO])?
-        .with_splat(ColorRGBA::from_rgb(100, 100, 100))?
-        .with_splat(Radius(inner_r))?
-        .send(&recording)?;
+    recording.log_timeless(
+        "world/collider",
+        &rerun::Points3D::new([[0.0, 0.0, 0.0]])
+            .with_colors([rerun::Color::from_rgb(100, 100, 100)])
+            .with_radii([inner_r]),
+    )?;
 
     let gravity_vector = ppga3d::Line::new(0.0, 0.0, -9.82, 0.0, 0.0, 0.0);
     let mut motors_curr = points
@@ -324,7 +302,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         log_with_rerun(
             &motors_curr,
             &active_collisions,
-            stable_time,
             time,
             &colors,
             &boxes,
